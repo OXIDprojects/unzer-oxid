@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Save Payment Data for registered Users
 - [0007723](https://bugs.oxid-esales.com/view.php?id=7723): In net mode, rounding errors are possible. If the total number of items is greater than the OXID total, a voucher will be added for the amount of the rounding error. Conversely, a dummy item will be added.
 - If other modules are installed that also extend the order model and contain non-serializable elements, maintenance may occur. Solution: Use a serializer that only contains data and no other elements.
+- [0007730](https://bugs.oxid-esales.com/view.php?id=7730): even if the credit card payment was cancelled (when entering the secure code), an order confirmation is sent 
 
 ## [1.1.3] - 2023-11-14
 
