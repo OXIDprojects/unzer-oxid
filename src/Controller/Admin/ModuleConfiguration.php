@@ -12,7 +12,6 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ApiClient;
@@ -33,7 +32,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     use ServiceContainer;
     use Request;
 
-    protected $translator = null;
+    protected Translator $translator;
     protected ModuleSettings $moduleSettings;
     protected UnzerWebhooks $unzerWebhooks;
     protected string $_sModuleId; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
@@ -129,11 +128,11 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         // save Apple Pay processing cert and key
         if (is_null($errorMessage)) {
-            $applePaymentProcessingCertificateService = $this->getServiceFromContainer(
+            $appleCertService = $this->getServiceFromContainer(
                 ApplePaymentProcessingCertificate::class
             );
-            $applePaymentProcessingCertificateService->saveCertificate($cert);
-            $applePaymentProcessingCertificateService->saveCertificateKey($key);
+            $appleCertService->saveCertificate($cert);
+            $appleCertService->saveCertificateKey($key);
         }
 
         // Upload Key
@@ -271,17 +270,17 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $applePayMerchCertKey
             );
 
-            $applePaymentProcessingCertificateService = $this->getServiceFromContainer(
+            $appleCerService = $this->getServiceFromContainer(
                 ApplePaymentProcessingCertificate::class
             );
 
-            $applePaymentProcessingCertificateService->saveCertificate(
+            $appleCerService->saveCertificate(
                 $this->getUnzerStringRequestEscapedParameter(
                     $systemMode . '-' . 'applePayPaymentProcessingCert'
                 )
             );
 
-            $applePaymentProcessingCertificateService->saveCertificateKey(
+            $appleCerService->saveCertificateKey(
                 $this->getUnzerStringRequestEscapedParameter(
                     $systemMode . '-' . 'applePayPaymentProcessingCertKey'
                 )

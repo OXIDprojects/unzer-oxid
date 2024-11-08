@@ -17,19 +17,16 @@ use OxidEsales\Eshop\Core\Request;
 use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
-use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentSessionService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use UnzerSDK\Constants\RecurrenceTypes;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Interfaces\UnzerParentInterface;
 use UnzerSDK\Resources\Basket as UnzerResourceBasket;
 use UnzerSDK\Resources\Customer;
-use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\Card as UnzerSDKPaymentTypeCard;
 use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerSDKPaymentTypePaypal;
@@ -169,7 +166,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         Basket $basketModel,
         Customer $customer,
         User $userModel,
-        BasePaymentType $paymentType
+        UnzerParentInterface $paymentType
     ): AbstractTransactionType {
         $this->throwExceptionIfPaymentDataError();
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
@@ -361,7 +358,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     }
 
     private function performDefaultTransaction(
-        BasePaymentType $paymentType,
+        UnzerParentInterface $paymentType,
         string $paymentProcedure,
         float $price,
         Basket $basketModel,
@@ -380,7 +377,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     }
 
     private function performTransactionForSavedPayment(
-        BasePaymentType $paymentType,
+        UnzerParentInterface $paymentType,
         string $paymentProcedure,
         float $price,
         Basket $basketModel,

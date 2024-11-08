@@ -140,7 +140,7 @@ class ModuleSettings
         );
     }
 
-    public function getApplePayLabel()
+    public function getApplePayLabel(): mixed
     {
         return $this->getSettingValue('applepay_label') ?:
             $this->config->getActiveShop()->getFieldData('oxcompany') ?: 'default_label';
@@ -373,7 +373,7 @@ class ModuleSettings
         return $privateKeys;
     }
 
-    private function saveSetting(string $name, $setting): void
+    private function saveSetting(string $name, bool|int|string|array $setting): void
     {
         $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
     }
@@ -392,7 +392,7 @@ class ModuleSettings
     /**
      * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
      */
-    private function isActiveSetting($active): bool
+    private function isActiveSetting(string $active): bool
     {
         return $active === '1';
     }

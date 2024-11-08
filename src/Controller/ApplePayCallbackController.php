@@ -21,9 +21,7 @@ class ApplePayCallbackController extends FrontendController
 {
     use ServiceContainer;
 
-    protected $_sThisTemplate = '@osc-unzer/frontend/tpl/account/account_saved_payments';
-
-    public function validateMerchant()
+    public function validateMerchant(): void
     {
         /** @var string $merchValidUrlRaw */
         $merchValidUrlRaw = Registry::getRequest()->getRequestEscapedParameter('merchantValidationUrl');
