@@ -45,12 +45,12 @@
 <div id="newcc" style="display:none;">
     <form id="payment-form-card" class="unzerUI form" novalidate>
         <div class="field">
-            <div id="card-element-id-number" class="unzerInput">
+            <div id="card-element-id-cardholder" class="unzerInput">
                 <!-- Card number UI Element will be inserted here. -->
             </div>
         </div>
         <div class="field">
-            <div id="card-element-id-cardholder" class="unzerInput">
+            <div id="card-element-id-number" class="unzerInput">
                 <!-- Card number UI Element will be inserted here. -->
             </div>
         </div>
