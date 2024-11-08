@@ -61,6 +61,13 @@ class PrePaymentBankAccountService
         );
     }
 
+    public function getDescriptor(string $unzerOrderNumber): ?string
+    {
+        return $this->getStringVarFromSession(
+            $this->getSessionVariableName($unzerOrderNumber, 'getDescriptor')
+        );
+    }
+
     private function getStringVarFromSession(string $varName): string
     {
         $result = $this->session->getVariable($varName);

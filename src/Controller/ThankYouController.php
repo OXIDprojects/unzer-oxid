@@ -69,6 +69,19 @@ class ThankYouController extends ThankYouController_parent
         return $result;
     }
 
+    /** Template variable getter. Returns Unzer PrePayment Holder */
+    public function getUnzerPrePaymentDescriptor(): ?string
+    {
+        $result = null;
+        $unzerOrderNumber = $this->getUnzerOrderNumberForPrePayments();
+        if ($unzerOrderNumber) {
+            $result = $this->getPrePaymentBankAccountService()->getDescriptor(
+                $unzerOrderNumber
+            );
+        }
+        return $result;
+    }
+
     private function getPrePaymentBankAccountService(): PrePaymentBankAccountService
     {
         return $this->getServiceFromContainer(PrePaymentBankAccountService::class);
