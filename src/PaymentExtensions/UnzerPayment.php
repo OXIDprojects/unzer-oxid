@@ -77,25 +77,17 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     {
         return $this->unzerOrderId;
     }
-    /**
-     * @return array
-     */
+
     public function getPaymentCurrencies(): array
     {
         return $this->allowedCurrencies;
     }
 
-    /**
-     * @return bool
-     */
     public function redirectUrlNeedPending(): bool
     {
         return $this->needPending;
     }
 
-    /**
-     * @return BasePaymentType
-     */
     abstract public function getUnzerPaymentTypeObject(): UnzerParentInterface;
 
     /**

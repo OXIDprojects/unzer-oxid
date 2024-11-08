@@ -69,10 +69,6 @@ class ApiClient
         return $this->request('keypair/applepay/privatekeys/' . $keyId);
     }
 
-    /**
-     * @throws GuzzleException
-     * @throws JsonException
-     */
     public function uploadApplePayPaymentKey(string $key): ?ResponseInterface
     {
         return $this->request('keypair/applepay/privatekeys', 'POST', [

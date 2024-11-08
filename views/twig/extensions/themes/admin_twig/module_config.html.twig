@@ -97,14 +97,12 @@
             {% elseif module_var == systemMode ~ "-applepay_merchant_identifier" %}
                 {# before we check the applepay_merchant_identifier, we have a upload-function for payment-key and payment-cert #}
                 {% set hidePaymentProcessingTextareas = false %}
-                {% if oView.getApplePayPaymentProcessingCertExists() and oView.getApplePayPaymentProcessingKeyExists() %}
-                    {% set hidePaymentProcessingTextareas = true %}
-                {% endif %}
+
                 <dl class="js-payment-cert-list" {% if hidePaymentProcessingTextareas %}style="display: none"{% endif %}>
                     <dt>
                             <textarea class="txt"
                                       style="width: 250px; height: 200px;"
-                                      name="applePayPaymentProcessingCert"></textarea>
+                                      name="{{ systemMode }}-applePayPaymentProcessingCert">{{ applePayPaymentProcessingCert }}</textarea>
                     </dt>
                     <dd>
                         {{ translate({ ident: "SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT", args: systemModeTrans }) }}
@@ -115,7 +113,7 @@
                     <dt>
                             <textarea class="txt"
                                       style="width: 250px; height: 200px;"
-                                      name="applePayPaymentProcessingCertKey"></textarea>
+                                      name="{{ systemMode }}-applePayPaymentProcessingCertKey">{{ applePayPaymentProcessingCertKey }}</textarea>
                     </dt>
                     <dd>
                         {{ translate({ ident: "SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT_KEY", args: systemModeTrans }) }}
@@ -152,7 +150,7 @@
                 </script>
                 <dl>
                     <dt>
-                        <input type=text  class="txt" style="width: 250px;" name="confstrs[{{ module_var }}]" value="{{ module_var }}" {{ readonly }}>
+                        <input type="text" class="txt" style="width: 250px;" name="confstrs[{{ module_var }}]" value="{{ confstrs[module_var] }}" {{ readonly }} id="confstrs">
                         {% include "inputhelp.html.twig" with {'sHelpId': help_id("HELP_SHOP_MODULE_"|cat(module_var)), 'sHelpText': help_text("HELP_SHOP_MODULE_"|cat(module_var))} %}
                     </dt>
                     <dd>

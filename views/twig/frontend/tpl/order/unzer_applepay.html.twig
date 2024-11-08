@@ -1,307 +1,224 @@
 {% include "@osc-unzer/frontend/tpl/order/unzer_assets.html.twig" %}
 {% if false %}<script>{% endif %}
-    {% capture assign = "unzerApplePayJS" %}
-        const $errorHolder = $('#error-holder');
+{% capture assign = "unzerApplePayJS" %}
+    const unzerInstance = new unzer('{{ unzerpub }}');
+    const unzerApplePayInstance = unzerInstance.ApplePay();
 
-        const unzerInstance = new unzer('{{ unzerpub }}');
-        const unzerApplePayInstance = unzerInstance.ApplePay();
-        const $form = $('#orderConfirmAgbBottom');
+    // Get the form element
+    const form = document.getElementById('orderConfirmAgbBottom');
 
-        $form.submit(function (e) {
-            e.preventDefault();
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        setupApplePaySession();
+    });
 
-            const agbCheck = $('[name=ord_agb]');
-            if (agbCheck && !agbCheck.is(':checked')) {
-                handleError({html: '{{ translate({ ident: 'READ_AND_CONFIRM_TERMS' }) }}'})
-                return;
-            }
-            setupApplePaySession();
-        });
+    function startApplePaySession(applePayPaymentRequest) {
+        if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
+            const session = new ApplePaySession(6, applePayPaymentRequest);
 
-        function startApplePaySession(applePayPaymentRequest) {
-            if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
-                const session = new ApplePaySession(6, applePayPaymentRequest);
-                session.onvalidatemerchant = function (event) {
-                    merchantValidationCallback(session, event);
-                };
-
-                session.onpaymentauthorized = function (event) {
-                    applePayAuthorizedCallback(event, session);
-                };
-
-                session.oncancel = onCancelCallback
-
-                session.begin();
-            } else {
-                handleError({message: 'This device does not support Apple Pay!'});
-            }
-        }
-
-        function applePayAuthorizedCallback(event, session) {
-            const paymentData = event.payment.token.paymentData;
-
-            unzerApplePayInstance.createResource(paymentData)
-                .then(function (result) {
-                    const hiddenInput = $(document.createElement('input'))
-                        .attr('type', 'hidden')
-                        .attr('name', 'paymentData')
-                        .val(JSON.stringify(result));
-
-                    $form.append(hiddenInput);
-
-                    $.post('{{ oViewConf.getSelfActionLink() }}', $form.serialize()).done(function (data) {
-                        session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
-                        window.location.href = data.redirectUrl;
-                    }).fail(function (error) {
-                        handleError({message: error.statusText});
-                        abortPaymentSession(session);
-                        window.location.href = '{{ oViewConf.getSelfLink() }}cl=payment&payerror=2'
-                    });
-                })
-                .catch(function (error) {
-                    const {message} = error;
-                    handleError({message});
-                    abortPaymentSession(session);
-                });
-        }
-
-        function merchantValidationCallback(session, event) {
-            $.post('{{ oViewConf.getSelfActionLink() }}', {
-                cl: 'unzer_applepay_callback',
-                fnc: 'validateMerchant',
-                merchantValidationUrl: event.validationURL
-            }).done(function (data) {
-                try {
-                    session.completeMerchantValidation(data.validationResponse);
-                } catch (e) {
-                    handleError({message: e.message});
-                }
-
-            }).fail(function (error) {
-                handleError({message: JSON.stringify(error.statusText)});
-                session.abort();
-            });
-        }
-
-        function onCancelCallback() {
-            handleError({message: 'Canceled by user'});
-        }
-
-        {% set currency = oView.getActCurrency() %}
-        {% set total = oxcmp_basket.getPrice() %}
-        {% set deliveryCost = oxcmp_basket.getDeliveryCost() %}
-
-        function setupApplePaySession() {
-            const applePayPaymentRequest = {
-                countryCode: '{{ oView.getUserCountryIso() }}',
-                currencyCode: '{{ currency.name }}',
-                total: {
-                    label: '{{ oView.getApplePayLabel() }}',
-                    amount: {{ total.getPrice() }}
-                },
-                merchantCapabilities: [
-                    'supports3DS',
-                    {% for capability in oView.getSupportedApplePayMerchantCapabilities() %}
-                        '{{ capability }}'{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                ],
-                supportedNetworks: [
-                    {% for network in oView.getSupportedApplePayNetworks() %}
-                        '{{ network }}'{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                ],
-                requiredShippingContactFields: [],
-                requiredBillingContactFields: [],
-                lineItems: [
-                    {% if not oxcmp_basket.getDiscounts() %}
-                        {
-                            label: '{{ translate({ ident: "TOTAL_NET" }) }}',
-                            type: 'final',
-                            amount: {{ oxcmp_basket.getNettoSum() }}
-                        },
-                        {% for key, vat in oxcmp_basket.getProductVats(false) %}
-                            {
-                                label: '{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: key }) }}',
-                                type: 'final',
-                                amount: {{ vat }}
-                            },
-                        {% endfor %}
-                        {
-                            label: '{{ translate({ ident: "TOTAL_GROSS", args: key }) }}',
-                            type: 'final',
-                            amount: {{ oxcmp_basket.getBruttoSum() }}
-                        },
-                    {% else %}
-                        {% if oxcmp_basket.isPriceViewModeNetto() %}
-                            {
-                                label: '{{ translate({ ident: "TOTAL_NET" }) }}',
-                                type: 'final',
-                                amount: {{ oxcmp_basket.getNettoSum() }}
-                            },
-                        {% else %}
-                            {
-                                label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
-                                type: 'final',
-                                amount: {{ oxcmp_basket.getBruttoSum() }}
-                            },
-                        {% endif %}
-                        {% for oDiscount in oxcmp_basket.getDiscounts() %}
-                            {% set discount = oDiscount.dDiscount*-1 %}
-                            {
-                                label: '{{ oDiscount.sDiscount }}',
-                                type: 'final',
-                                amount: {{ discount }}
-                            },
-                        {% endfor %}
-                        {% if not oxcmp_basket.isPriceViewModeNetto() %}
-                            {
-                                label: '{{ translate({ ident: "TOTAL_NET" }) }}',
-                                type: 'final',
-                                amount: {{ oxcmp_basket.getNettoSum() }}
-                            },
-                        {% endif %}
-                        {% for key, vat in oxcmp_basket.getProductVats(false) %}
-                            {
-                                label: '{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: key }) }}',
-                                type: 'final',
-                                amount: {{ vat }}
-                            },
-                        {% endfor %}
-                        {% if oxcmp_basket.isPriceViewModeNetto() %}
-                            {
-                                label: '{{ translate({ ident: "TOTAL_GROSS", args: key }) }}',
-                                type: 'final',
-                                amount: {{ oxcmp_basket.getBruttoSum() }}
-                            },
-                        {% endif %}
-                    {% endif %}
-
-                    {% if oViewConf.getShowVouchers() and oxcmp_basket.getVoucherDiscValue() %}
-                        {% for oVoucher in oxcmp_basket.getVouchers() %}
-                            {% set voucherDiscount = oVoucher.dVoucherdiscount*-1 %}
-                            {
-                                label: '{{ translate({ ident: "COUPON" }) }} ({{ translate({ ident: "NUMBER" }) }} {{ oVoucher.sVoucherNr }})',
-                                type: 'final',
-                                amount: {{ voucherDiscount }}
-                            },
-                        {% endfor %}
-                    {% endif %}
-                    {% if deliveryCost and (oxcmp_basket.getBasketUser() or oViewConf.isFunctionalityEnabled('blCalculateDelCostIfNotLoggedIn')) %}
-                        {% if oViewConf.isFunctionalityEnabled('blShowVATForDelivery')  %}
-                            {% set dShippingVatValue = deliveryCost.getVatValue() %}
-                            {
-                                label: '{{ translate({ ident: "SHIPPING_NET" }) }}',
-                                type: 'final',
-                                amount: {{ deliveryCost.getNettoPrice() }}
-                            },
-                            {% if dShippingVatValue %}
-                                {
-                                    label: '{% if oxcmp_basket.isProportionalCalculationOn() %}{{ translate({ ident: "BASKET_TOTAL_PLUS_PROPORTIONAL_VAT", suffix: "COLON" }) }}{% else %}{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: deliveryCost.getVat() }) }}{% endif %}',
-                                    type: 'final',
-                                    amount: {{ dShippingVatValue }}
-                                },
-                            {% endif %}
-                        {% else %}
-                            {
-                                label: '{{ translate({ ident: "SHIPPING_COST" }) }}',
-                                type: 'final',
-                                amount: {{ deliveryCost.getBruttoPrice() }}
-                            },
-                        {% endif %}
-                    {% endif %}
-
-                    {% set paymentCost = oxcmp_basket.getPaymentCost() %}
-                    {% if paymentCost and paymentCost.getPrice() %}
-                        {% if oViewConf.isFunctionalityEnabled('blShowVATForPayCharge') %}
-                            {
-                                label: '{% if paymentCost.getPrice() >= 0 %}{{ translate({ ident: "SURCHARGE" }) }}{% else %}{{ translate({ ident: "DEDUCTION" }) }}{{ translate({ ident: "PAYMENT_METHOD" }) }}{% endif %}',
-                                type: 'final',
-                                amount: {{ paymentCost.getNettoPrice() }}
-                            },
-                            {% if paymentCost.getVatValue() %}
-                                {
-                                    label: '{% if oxcmp_basket.isProportionalCalculationOn() %}{{ translate({ ident: "BASKET_TOTAL_PLUS_PROPORTIONAL_VAT" }) }}{% else %}{{ translate({ ident: "SURCHARGE_PLUS_PERCENT_AMOUNT", args: paymentCost.getVat() }) }}{% endif %}',
-                                    type: 'final',
-                                    amount: {{ paymentCost.getVatValue() }}
-                                },
-                            {% endif %}
-                        {% else %}
-                            {
-                                label: '{% if paymentCost.getPrice() >= 0 %}{{ translate({ ident: "SURCHARGE" }) }}{% else %}{{ translate({ ident: "DEDUCTION" }) }}{{ translate({ ident: "PAYMENT_METHOD" }) }}{% endif %}',
-                                type: 'final',
-                                amount: {{ paymentCost.getBruttoPrice() }}
-                            },
-                        {% endif %}
-                    {% endif %}
-                    {% if oViewConf.getShowGiftWrapping() %}
-                        {% set wrappingCost = oxcmp_basket.getWrappingCost() %}
-                        {% if wrappingCost and wrappingCost.getPrice() > 0 %}
-                            {% if oViewConf.isFunctionalityEnabled('blShowVATForWrapping') %}
-                                {
-                                    label: '{{ translate({ ident: "BASKET_TOTAL_WRAPPING_COSTS_NET" }) }}',
-                                    type: 'final',
-                                    amount: {{ wrappingCost.getNettoPrice() }}
-                                },
-                                {% if oxcmp_basket.getWrappCostVat() %}
-                                    {
-                                        label: '{{ translate({ ident: "PLUS_VAT" }) }}',
-                                        type: 'final',
-                                        amount: {{ wrappingCost.getVatValue() }}
-                                    },
-                                {% endif %}
-                            {% else %}
-                                {
-                                    label: '{{ translate({ ident: "GIFT_WRAPPING" }) }}',
-                                    type: 'final',
-                                    amount: {{ wrappingCost.getBruttoPrice() }}
-                                },
-                            {% endif %}
-                        {% endif %}
-                        {% set giftCardCost = oxcmp_basket.getGiftCardCost() %}
-                        {% if giftCardCost and giftCardCost.getPrice() > 0  %}
-                            {% if oViewConf.isFunctionalityEnabled('blShowVATForWrapping')  %}
-                                {
-                                    label: '{{ translate({ ident: "BASKET_TOTAL_GIFTCARD_COSTS_NET" }) }}',
-                                    type: 'final',
-                                    amount: {{ giftCardCost.getNettoPrice() }}
-                                },
-                                {
-                                    label: '{% if oxcmp_basket.isProportionalCalculationOn() %}{{ translate({ ident: "BASKET_TOTAL_PLUS_PROPORTIONAL_VAT" }) }}{% else %}{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: giftCardCost.getVat() }) }}{% endif %}',
-                                    type: 'final',
-                                    amount: {{ giftCardCost.getVatValue() }}
-                                },
-                            {% else %}
-                                {
-                                    label: '{{ translate({ ident: "GREETING_CARD" }) }}',
-                                    type: 'final',
-                                    amount: {{ giftCardCost.getBruttoPrice() }}
-                                },
-                            {% endif %}
-                        {% endif %}
-                    {% endif %}
-                ]
+            session.onvalidatemerchant = function (event) {
+                merchantValidationCallback(session, event);
             };
 
-            startApplePaySession(applePayPaymentRequest);
+            session.onpaymentauthorized = function (event) {
+                applePayAuthorizedCallback(event, session);
+            };
+
+            session.oncancel = onCancelCallback;
+
+            session.begin();
+        } else {
+            handleError({ message: 'This device does not support Apple Pay!', error: new Error('Apple Pay not supported') });
         }
+    }
 
-        function handleError({html = '{{ translate({ ident: "oscunzer_APPLEPAY_ERROR" }) }}', message} = {html: '{{ translate({ ident: "oscunzer_APPLEPAY_ERROR" }) }}'}) {
-            {% if oViewConf.isUnzerDebugMode() %}
-                if (message) {
-                    console.error(message);
-                }
-            {% endif %}
+    function applePayAuthorizedCallback(event, session) {
+        const paymentData = event.payment.token.paymentData;
+        let actionEncodedUrl = '{{ oViewConf.getSelfActionLink() }}';
+        let decodedUrl = actionEncodedUrl.replace(/&amp;amp;/g, '&');
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Accept', 'application/json');
+        unzerApplePayInstance.createResource(paymentData)
+            .then(function (result) {
+                session.completePayment({ status: window.ApplePaySession.STATUS_SUCCESS });
+                window.location.href = decodedUrl + '&cl=thankyou';
+            })
+            .catch(function (error) {
+                abortPaymentSession(session);
+                window.location.href = '{{ oViewConf.getSelfLink() }}cl=payment&payerror=2';
+            }
+        );
+    }
 
-            $('.js-unzer-error-holder').html(html).show(0, function () {
-                $(this).focus();
-                $('html, body').animate({scrollTop: 0}, "slow");
-            });
-        }
+    function merchantValidationCallback(session, event) {
+        let actionEncodedUrl = '{{ oViewConf.getSelfActionLink() }}';
+        let decodedUrl = actionEncodedUrl.replace(/&amp;amp;/g, '&');
 
-        function abortPaymentSession(session) {
-            session.completePayment({status: window.ApplePaySession.STATUS_FAILURE});
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Accept', 'application/json');
+
+        let formData = new FormData();
+        formData.append('cl', 'unzer_applepay_callback');
+        formData.append('fnc', 'validateMerchant');
+        formData.append('merchantValidationUrl',  event.validationURL);
+        formData.append('stoken', '{{ oViewConf.getSessionChallengeToken() }}');
+
+        fetch(decodedUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: headers,
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+            return response.json();
+        })
+        .then(function (data) {
+            try {
+                session.completeMerchantValidation(data.validationResponse);
+            } catch (e) {
+                handleError({ message: 'cannot complete merchant valiation ' + e.message, e });
+            }
+        })
+        .catch(function (error) {
+            handleError({ message: error.message, error });
             session.abort();
+        });
+    }
+
+    function onCancelCallback() {
+        handleError({ message: 'Canceled by user', error: new Error('Not Error: User canceled') });
+    }
+
+    {% set currency = oView.getActCurrency() %}
+    {% set total = oxcmp_basket.getPrice() %}
+    {% set deliveryCost = oxcmp_basket.getDeliveryCost() %}
+
+    function setupApplePaySession() {
+        const applePayPaymentRequest = {
+            countryCode: '{{ oView.getUserCountryIso() }}',
+            currencyCode: '{{ currency.name }}',
+            total: {
+                label: '{{ oView.getApplePayLabel() }}',
+                amount: {{ total.getPrice() }},
+            },
+            merchantCapabilities: [
+                'supports3DS',
+                {% for capability in oView.getSupportedApplePayMerchantCapabilities() %}
+                    '{{ capability }}'{% if not loop.last %}, {% endif %}
+    {% endfor %}
+            ],
+            supportedNetworks: [
+                {% for network in oView.getSupportedApplePayNetworks() %}
+                    '{{ network }}'{% if not loop.last %}, {% endif %}
+    {% endfor %}
+        ],
+        requiredShippingContactFields: [],
+        requiredBillingContactFields: [],
+        lineItems: [
+            {% if not oxcmp_basket.getDiscounts() %}
+                {
+                    label: '{{ translate({ ident: "TOTAL_NET" }) }}',
+                    type: 'final',
+                    amount: {{ oxcmp_basket.getNettoSum() }},
+                },
+                {% for key, vat in oxcmp_basket.getProductVats(false) %}
+                    {
+                        label: '{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: key }) }}',
+                        type: 'final',
+                        amount: {{ vat }},
+                    },
+                {% endfor %}
+                {
+                    label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
+                    type: 'final',
+                    amount: {{ oxcmp_basket.getBruttoSum() }},
+                },
+            {% else %}
+    {% if oxcmp_basket.isPriceViewModeNetto() %}
+        {
+            label: '{{ translate({ ident: "TOTAL_NET" }) }}',
+            type: 'final',
+            amount: {{ oxcmp_basket.getNettoSum() }},
+        },
+    {% else %}
+        {
+            label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
+            type: 'final',
+            amount: {{ oxcmp_basket.getBruttoSum() }},
+        },
+    {% endif %}
+    {% for oDiscount in oxcmp_basket.getDiscounts() %}
+    {% set discount = oDiscount.dDiscount * -1 %}
+            {
+                label: '{{ oDiscount.sDiscount }}',
+                type: 'final',
+                amount: {{ discount }},
+            },
+        {% endfor %}
+    {% if not oxcmp_basket.isPriceViewModeNetto() %}
+            {
+                label: '{{ translate({ ident: "TOTAL_NET" }) }}',
+                type: 'final',
+                amount: {{ oxcmp_basket.getNettoSum() }},
+            },
+        {% endif %}
+    {% for key, vat in oxcmp_basket.getProductVats(false) %}
+        {
+            label: '{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: key }) }}',
+            type: 'final',
+            amount: {{ vat }},
+        },
+    {% endfor %}
+    {% if oxcmp_basket.isPriceViewModeNetto() %}
+        {
+            label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
+            type: 'final',
+            amount: {{ oxcmp_basket.getBruttoSum() }},
+        },
+    {% endif %}
+    {% endif %}
+
+    {% if oViewConf.getShowVouchers() and oxcmp_basket.getVoucherDiscValue() %}
+    {% for oVoucher in oxcmp_basket.getVouchers() %}
+    {% set voucherDiscount = oVoucher.dVoucherdiscount * -1 %}
+            {
+                label: '{{ translate({ ident: "COUPON" }) }} ({{ translate({ ident: "NUMBER" }) }} {{ oVoucher.sVoucherNr }})',
+                type: 'final',
+                amount: {{ voucherDiscount }},
+            },
+        {% endfor %}
+    {% endif %}
+            ],
+        };
+
+        startApplePaySession(applePayPaymentRequest);
+    }
+
+    function handleError({ html = '{{ translate({ ident: "oscunzer_APPLEPAY_ERROR" }) }}', message, error } = {}) {
+        {% if oViewConf.isUnzerDebugMode() %}
+        if (message) {
+            console.log("ApplePay Unzer Modul Error: " + message);
         }
+        {% endif %}
+
+        const errorElement = document.querySelector('.js-unzer-error-holder');
+        if (errorElement) {
+            errorElement.innerHTML = html;
+            errorElement.style.display = 'block';
+            errorElement.focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function abortPaymentSession(session) {
+        session.completePayment({ status: window.ApplePaySession.STATUS_FAILURE });
+        session.abort();
+    }
     {% endcapture %}
 {% if false %}</script>{% endif %}
 
