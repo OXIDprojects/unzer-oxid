@@ -65,7 +65,7 @@
         formData.append('merchantValidationUrl',  event.validationURL);
         formData.append('stoken', '{{ oViewConf.getSessionChallengeToken() }}');
 
-        fetch(decodedUrl, {
+        fetch(shopSelfUrl, {
             method: 'POST',
             mode: 'no-cors',
             headers: headers,

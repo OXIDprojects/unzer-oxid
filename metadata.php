@@ -227,11 +227,11 @@ $aModule = [
             'constraints' => '0|1'
         ],
         [
-            'group'       => 'unzerapplepay',
-            'name'        => 'UnzerOption_oscunzer_applepay',
-            'type'        => 'select',
-            'value'       => '0',
-            'constraints' => '0|1'
+            'group' => 'unzerapplepay',
+            'name' => 'UnzerOption_oscunzer_applepay',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0'
         ],
         [
             'group' => 'unzerapplepay',

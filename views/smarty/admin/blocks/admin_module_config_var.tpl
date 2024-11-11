@@ -39,7 +39,7 @@
     </dl>
     [{elseif $var_group eq "unzerapplepay"}]
         [{if $module_var eq "UnzerOption_oscunzer_applepay"}]
-            [{$smarty.block.parent}]
+            &nbsp;
         [{elseif $module_var eq "applepay_merchant_capabilities" or $module_var eq "applepay_networks"}]
             <dl>
                 <dd>
