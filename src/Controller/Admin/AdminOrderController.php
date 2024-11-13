@@ -43,17 +43,8 @@ class AdminOrderController extends AdminDetailsController
     use ServiceContainer;
     use Request;
 
-    /**
-     * Active order object
-     *
-     * @var Order $editObject
-     */
-    protected $editObject = null;
-
-    /** @var Payment $oPayment */
-    protected $oPayment = null;
-
-    /** @var string $sTypeId */
+    protected ?Order $editObject = null;
+    protected Payment $oPayment;
     protected string $sTypeId;
 
     /**
@@ -512,11 +503,7 @@ class AdminOrderController extends AdminDetailsController
 
         return $this->oPayment->isUnzerSecuredPayment();
     }
-    /**
-     * Returns editable order object
-     *
-     * @return Order|null
-     */
+
     public function getEditObject(): ?object
     {
         $soxId = $this->getEditObjectId();

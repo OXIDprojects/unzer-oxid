@@ -70,12 +70,26 @@ $aLang = [
     'OSCUNZER_REASON_RETURN' => 'Kunde sendet Ware zurück',
     'OSCUNZER_REASON_CREDIT' => 'Kunde bekommt Geld zurück, Ware kann er behalten',
     'OSCUNZER_PAYOUT' => 'Rückzahlung',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY' => 'Konnte privaten Schlüssel zur Zahlungsabwicklung nicht übertragen',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT' => 'Konnte Zertifikat zur Zahlungsabwicklung nicht übertragen',
-    'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT' => 'Konnte Zertifikat zur Zahlungsabwicklung nicht aktivieren',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY' => 'Konnte privaten Schlüssel zur Zahlungsabwicklung nicht abgleichen',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'Konnte Zertifikat zur Zahlungsabwicklung nicht abgleichen',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY' => 'ApplePay: Konnte privaten Schlüssel zur Zahlungsabwicklung nicht übertragen',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT' => 'ApplePay: Konnte Zertifikat zur Zahlungsabwicklung nicht übertragen',
+    'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT' => 'ApplePay: Konnte Zertifikat zur Zahlungsabwicklung nicht aktivieren',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY' => 'ApplePay: Konnte privaten Schlüssel zur Zahlungsabwicklung nicht abgleichen',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'ApplePay: Konnte Zertifikat zur Zahlungsabwicklung nicht abgleichen',
     'OSCUNZER_sandbox' => 'Sandbox',
     'OSCUNZER_production' => 'Livebetrieb',
     'OSCUNZER_CHARGEBACK' => 'Chargeback erfolgt!',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_SET_CERT' => 'ApplePay: Übertragung des Händlerzertifikats fehlgeschlagen',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_KEY_TOO_SHORT' => 'ApplePay: Händlerschlüssel ist zu kurz',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_KEY_EMPTY' => 'ApplePay: Händlerschlüssel ist leer',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_CERT_TOO_SHORT' => 'ApplePay: Händlerzertifikat ist zu kurz',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_CERT_EMPTY' => 'ApplePay: Händlerzertifikat ist leer',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY_TOO_SHORT' => 'ApplePay: Zahlungsschlüssel ist zu kurz',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY_EMPTY' => 'ApplePay: Zahlungsschlüssel ist leer',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT_TOO_SHORT' => 'ApplePay: Zahlungszertifikat ist zu kurz',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT_EMPTY' => 'ApplePay: Zahlungszertifikat ist leer',
 ];

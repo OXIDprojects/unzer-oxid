@@ -79,11 +79,11 @@
                 <dt>
                     [{if $module_var eq $systemMode|cat:"-applepay_merchant_cert_key"}]
                         <textarea class="txt"
-                                  style="width: 250px; height: 200px;"
+                                  style="width: 550px; height: 200px;"
                                   name="[{$systemMode}]-applePayMerchantCertKey" [{$readonly}]>[{$applePayMerchantCertKey}]</textarea>
                     [{else}]
                         <textarea class="txt"
-                                  style="width: 250px; height: 200px;"
+                                  style="width: 550px; height: 200px;"
                                   name="[{$systemMode}]-applePayMerchantCert" [{$readonly}]>[{$applePayMerchantCert}]</textarea>
                     [{/if}]
                     [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`" args=$systemModeTrans}]
@@ -102,7 +102,7 @@
             <dl class="js-payment-cert-list">
                 <dt>
                         <textarea class="txt"
-                                  style="width: 250px; height: 200px;"
+                                  style="width: 550px; height: 200px;"
                                   name="[{$systemMode}]-applePayPaymentProcessingCert">[{$applePayPaymentProcessingCert}]</textarea>
                 </dt>
                 <dd>
@@ -113,7 +113,7 @@
             <dl class="js-payment-cert-list" [{if $hidePaymentProcessingTextareas}]style="display: none"[{/if}]>
                 <dt>
                         <textarea class="txt"
-                                  style="width: 250px; height: 200px;"
+                                  style="width: 550px; height: 200px;"
                                   name="[{$systemMode}]-applePayPaymentProcessingCertKey">[{$applePayPaymentProcessingCertKey}]</textarea>
                 </dt>
                 <dd>
