@@ -70,11 +70,27 @@ $aLang = [
     'OSCUNZER_REASON_RETURN' => 'Customer sends articles back',
     'OSCUNZER_REASON_CREDIT' => 'Customer gets money back, he can keep articles',
     'OSCUNZER_PAYOUT' => 'Payout',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY' => 'Transmitting key failed',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT' => 'Transmitting certificate failed',
-    'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT' => 'Activating certificate failed',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY' => 'Getting key failed',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'Getting certificate failed',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY' => 'ApplePay: Transmitting key failed',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT' => 'ApplePay: Transmitting payment certificate failed',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_SET_CERT' => 'ApplePay: Transmitting merchant certificate failed',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_KEY_TOO_SHORT' => 'ApplePay: Merchant key is too short',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_KEY_EMPTY' => 'ApplePay: Merchant key is empty',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_CERT_TOO_SHORT' => 'ApplePay: Merchant certificate is too short',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_CERT_EMPTY' => 'ApplePay: Merchant certificate is empty',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY_TOO_SHORT' => 'ApplePay: Payment key is too short',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY_EMPTY' => 'ApplePay: Payment key is empty',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT_TOO_SHORT' => 'ApplePay: Payment certificate is too short',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT_EMPTY' => 'ApplePay: Payment certificate is empty',
+
+    'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT' => 'ApplePay: Activating certificate failed',
+
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY' => 'ApplePay: Getting key failed',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'ApplePay: Getting certificate failed',
     'OSCUNZER_sandbox' => 'Sandbox',
     'OSCUNZER_production' => 'Production',
     'OSCUNZER_CHARGEBACK' => 'Chargeback occurred!',

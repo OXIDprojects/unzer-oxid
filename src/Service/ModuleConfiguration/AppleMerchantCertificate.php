@@ -6,7 +6,7 @@ namespace OxidSolutionCatalysts\Unzer\Service\ModuleConfiguration;
 
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 
-class ApplePaymentProcessingCertificate
+class AppleMerchantCertificate
 {
     private ModuleSettings $moduleSettings;
 
@@ -21,7 +21,7 @@ class ApplePaymentProcessingCertificate
         }
 
         return (bool) file_put_contents(
-            $this->moduleSettings->getApplePayPaymentCertFilePath(),
+            $this->moduleSettings->getApplePayMerchantCertFilePath(),
             $certificate
         );
     }
@@ -32,7 +32,7 @@ class ApplePaymentProcessingCertificate
         }
 
         return (bool) file_put_contents(
-            $this->moduleSettings->getApplePayPaymentPrivateKeyFilePath(),
+            $this->moduleSettings->getApplePayMerchantCertKeyFilePath(),
             $certificateKey
         );
     }
