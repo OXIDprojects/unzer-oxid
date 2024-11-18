@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -19,7 +20,6 @@ use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
-use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use stdClass;

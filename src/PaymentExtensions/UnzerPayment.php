@@ -429,7 +429,7 @@ abstract class UnzerPayment
                 false,
                 null,
                 null,
-                \UnzerSDK\Constants\RecurrenceTypes::ONE_CLICK
+                RecurrenceTypes::ONE_CLICK
             );
         }
 

@@ -11,7 +11,7 @@ use Exception;
 use JsonException;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
-use OxidSolutionCatalysts\Unzer\Model\Order;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -228,22 +228,20 @@ class Transaction
     protected function saveTransaction(array $params): bool
     {
         $result = false;
-
         $transaction = $this->getNewTransactionObject();
 
-        //check if metadata exists
         $params['metadata'] = $params['metadata'] ?? json_encode('', JSON_THROW_ON_ERROR);
 
-        // building oxid from unique index columns
-        // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
         $oxid = $this->prepareTransactionOxid($params);
+
+//        if (!$transaction->load($oxid) && $this->canSaveTransaction($transaction, $params)) {
         if (!$transaction->load($oxid)) {
             $transaction->assign($params);
             $transaction->setId($oxid);
             $transaction->save();
-
             $result = true;
         }
+
         return $result;
     }
 

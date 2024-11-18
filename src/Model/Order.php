@@ -26,6 +26,8 @@ use UnzerSDK\Resources\Payment;
 /**
  * TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ *
+ * @mixin \OxidEsales\Eshop\Application\Model\Order
  */
 class Order extends Order_parent
 {

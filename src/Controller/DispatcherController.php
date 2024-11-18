@@ -9,8 +9,8 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use JsonException;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;

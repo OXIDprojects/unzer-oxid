@@ -8,3 +8,7 @@ parameters:
         - ../../vendor/oxid-esales/oxideshop-ce/source/overridablefunctions.php
     ignoreErrors:
         - identifier: missingType.iterableValue
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::createTmpOrder\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::markUnzerOrderAsPaid\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::getUnzerInvoiceNr\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::setUnzerTransId\(\)#'
