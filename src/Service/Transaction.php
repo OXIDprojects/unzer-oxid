@@ -416,12 +416,11 @@ class Transaction
     }
 
     /**
-     * @param $paymentid
      * @return array|false
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
-    public static function getTransactionDataByPaymentId(string $paymentid)
+    public function getTransactionDataByPaymentId(string $paymentid)
     {
         if ($paymentid) {
             return DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(

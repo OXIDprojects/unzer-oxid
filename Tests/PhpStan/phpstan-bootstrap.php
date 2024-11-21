@@ -62,6 +62,11 @@ class_alias(
 );
 
 class_alias(
+    \OxidSolutionCatalysts\Unzer\Model\Order::class,
+    \OxidEsales\Eshop\Application\Model\Order::class,
+);
+
+class_alias(
     \OxidEsales\Eshop\Application\Model\Payment::class,
     \OxidSolutionCatalysts\Unzer\Model\Payment_parent::class
 );

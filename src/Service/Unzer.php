@@ -25,7 +25,6 @@ use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
-use OxidSolutionCatalysts\Unzer\Model\Order as UnzerModelOrder;
 use OxidSolutionCatalysts\Unzer\Model\UnzerPaymentData;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\BasketItemTypes;
@@ -438,7 +437,7 @@ class Unzer
         $orderedAmount = 0.;
         /** @var ListModel $orderList */
         $orderList = $oUser->getOrders();
-        /** @var UnzerModelOrder $order */
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
         foreach ($orderList as $order) {
             $orderedAmount += $order->getTotalOrderSum();
         }

@@ -12,3 +12,4 @@ parameters:
         - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::markUnzerOrderAsPaid\(\)#'
         - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::getUnzerInvoiceNr\(\)#'
         - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::setUnzerTransId\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::finalizeTmpOrder\(\)#'

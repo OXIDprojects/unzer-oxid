@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Order;
 use ReflectionClass;
 use ReflectionException;
 use stdClass;
@@ -33,7 +34,7 @@ class FlexibleSerializer
      * @param array $allowedClasses An array of fully qualified class names that are allowed to be unserialized.
      * @return mixed The unserialized data.
      */
-    public function safeUnserialize(string $serialized, array $allowedClasses = [])
+    public function safeUnserialize($serialized, array $allowedClasses = [])
     {
         $unserializedData = unserialize(
             $serialized,
@@ -45,6 +46,35 @@ class FlexibleSerializer
             ]
         );
         return $this->restoreUnserializable($unserializedData, $allowedClasses);
+    }
+
+    public function restoreOrderFromStrClass(string $serialized): ?Order
+    {
+        /** @var object $unserializedData */
+        $unserializedData = unserialize(
+            $serialized,
+            [
+                'allowed_classes' => [stdClass::class, Order::class]
+            ]
+        );
+
+        $order = $this->getOrderModel();
+
+        foreach (get_object_vars($unserializedData) as $property => $value) {
+            if (property_exists($order, $property) || method_exists($order, 'setFieldData')) {
+                if (method_exists($order, 'setFieldData')) {
+                    $order->setFieldData($property, $value);
+                }
+                $order->$property = $value;
+            }
+        }
+
+        return $order;
+    }
+
+    protected function getOrderModel(): Order
+    {
+        return oxNew(Order::class);
     }
 
     /**
