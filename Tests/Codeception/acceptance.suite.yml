@@ -30,8 +30,6 @@ modules:
             %PHP_BIN% %VENDOR_PATH%/bin/reset-shop
             && mysql --defaults-file=$mysql_config --default-character-set=utf8 $dbname < $dump
             && mysql --defaults-file=$mysql_config --default-character-set=utf8 $dbname < $module_dump
-            && %PHP_BIN% /var/www/bin/oe-console oe:module:activate osc_paypal
-            && %PHP_BIN% /var/www/bin/oe-console oe:module:activate osc_amazonpay
     - \OxidEsales\Codeception\Module\Oxideshop:
         screen_shot_url: '%SCREEN_SHOT_URL%'
         depends:
