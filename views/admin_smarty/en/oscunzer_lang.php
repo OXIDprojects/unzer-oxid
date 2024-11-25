@@ -88,9 +88,9 @@ $aLang = [
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT_EMPTY' => 'ApplePay: Payment certificate is empty',
 
     'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT' => 'ApplePay: Activating certificate failed',
-
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY' => 'ApplePay: Getting key failed',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'ApplePay: Getting certificate failed',
+
     'OSCUNZER_sandbox' => 'Sandbox',
     'OSCUNZER_production' => 'Production',
     'OSCUNZER_CHARGEBACK' => 'Chargeback occurred!',

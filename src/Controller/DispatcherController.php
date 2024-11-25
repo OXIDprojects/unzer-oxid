@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
+use OxidSolutionCatalysts\Unzer\Service\FlexibleSerializer;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
@@ -35,12 +36,16 @@ class DispatcherController extends FrontendController
     public function __construct()
     {
         parent::__construct();
-        $this->transaction = $this->getServiceFromContainer(Transaction::class);
-        $this->unzerWebhooks = $this->getServiceFromContainer(UnzerWebhooks::class);
-        $this->unzerSDKLoader = $this->getServiceFromContainer(UnzerSDKLoader::class);
-        $this->translator = $this->getServiceFromContainer(Translator::class);
+        $this->transaction = $this->getTransactionService();
+        $this->unzerWebhooks = $this->getUnzerWebhooks();
+        $this->unzerSDKLoader = $this->getUnzerSdkLoader();
+        $this->translator = $this->getTranslator();
     }
 
+    /**
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
+     */
     public function updatePaymentTransStatus(): void
     {
         $jsonRequest = file_get_contents('php://input');
@@ -78,7 +83,7 @@ class DispatcherController extends FrontendController
         }
 
         $unzer = $this->unzerSDKLoader->getUnzerSDKbyKey($unzerKey);
-        $resource = $unzer->fetchResourceFromEvent((string)$jsonRequest);
+        $resource = $unzer->fetchResourceFromEvent($jsonRequest);
         $paymentId = $resource->getId();
 
         if ($paymentId) {
@@ -103,12 +108,12 @@ class DispatcherController extends FrontendController
         $order = oxNew(Order::class);
         $data = $this->transaction->getTransactionDataByPaymentId($paymentId);
 
-        if (!is_array($data) || !isset($data[0]['OXORDERID'])) {
+        if (!is_array($data) || !isset($data[0]['oxorderid'])) {
             return "Invalid Order Data";
         }
 
         $unzerPayment = $unzer->fetchPayment($paymentId);
-        if ($order->load($data[0]['OXORDERID'])) {
+        if ($order->load($data[0]['oxorderid'])) {
             return $this->updateOrder($order, $unzerPayment, $paymentId);
         }
 
@@ -172,6 +177,58 @@ class DispatcherController extends FrontendController
         return $this->translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
     }
 
+    public function finalizeTmpOrder(
+        Payment $unzerPayment,
+        TmpOrder $tmpOrder,
+        array $tmpData,
+        bool $bError
+    ): string {
+        $return = $this->returnError();
+        if ($tmpOrder->load($tmpData['OXID'])) {
+            $flexibleSerializer = $this->getFlexibleSerializer();
+            $oOrder = $flexibleSerializer->safeUnserialize($tmpData['tmporder'], [Order::class]);
+
+            if ($oOrder instanceof \stdClass || $oOrder === false) {
+                $oOrder = $flexibleSerializer->restoreOrderFromStrClass($tmpData['tmporder']);
+            }
+
+            if ($oOrder instanceof Order) {
+                $oOrder->finalizeTmpOrder($unzerPayment, $bError);
+                $tmpOrder->assign(['status' => 'FINISHED']);
+                $tmpOrder->save();
+
+                $return = $this->returnSuccess();
+            }
+        }
+
+        return $return;
+    }
+
+    protected function getFlexibleSerializer(): FlexibleSerializer
+    {
+        return $this->getServiceFromContainer(FlexibleSerializer::class);
+    }
+
+    protected function getUnzerSdkLoader(): UnzerSDKLoader
+    {
+        return $this->getServiceFromContainer(UnzerSDKLoader::class);
+    }
+
+    protected function getTranslator(): Translator
+    {
+        return $this->getServiceFromContainer(Translator::class);
+    }
+
+    protected function getUnzerWebhooks(): UnzerWebhooks
+    {
+        return $this->getServiceFromContainer(UnzerWebhooks::class);
+    }
+
+    protected function getTransactionService(): Transaction
+    {
+        return $this->getServiceFromContainer(Transaction::class);
+    }
+
     private function handleTmpOrder(Payment $unzerPayment): string
     {
         $tmpOrder = oxNew(TmpOrder::class);
@@ -190,27 +247,6 @@ class DispatcherController extends FrontendController
             );
 
             return $this->finalizeTmpOrder($unzerPayment, $tmpOrder, $tmpData, $bError);
-        }
-
-        return $this->translator->translate('oscunzer_ERROR_HANDLE_TMP_ORDER');
-    }
-
-    private function finalizeTmpOrder(
-        Payment $unzerPayment,
-        TmpOrder $tmpOrder,
-        array $tmpData,
-        bool $bError
-    ): string {
-        if ($tmpOrder->load($tmpData['OXID'])) {
-            $aOrderData = unserialize(base64_decode($tmpData['TMPORDER']), ['allowed_classes' => [Order::class]]);
-            $oOrder = is_array($aOrderData) && isset($aOrderData['order']) ? $aOrderData['order'] : null;
-
-            if ($oOrder) {
-                $oOrder->finalizeTmpOrder($unzerPayment, $bError);
-                $tmpOrder->assign(['status' => 'FINISHED']);
-                $tmpOrder->save();
-                return $this->translator->translate('oscunzer_SUCCESS_HANDLE_TMP_ORDER');
-            }
         }
 
         return $this->translator->translate('oscunzer_ERROR_HANDLE_TMP_ORDER');

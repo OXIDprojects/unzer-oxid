@@ -52,8 +52,8 @@
     }
 
     function merchantValidationCallback(session, event) {
-        let actionEncodedUrl = '{{ oViewConf.getSelfActionLink() }}';
-        let decodedUrl = actionEncodedUrl.replace(/&amp;amp;/g, '&');
+        let shopSelfUrlEscaped = '{{ oViewConf.getSelfActionLink() }}';
+        let shopSelfUrl = shopSelfUrlEscaped.replace(/&amp;amp;/g, '&');
 
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
@@ -65,12 +65,15 @@
         formData.append('merchantValidationUrl',  event.validationURL);
         formData.append('stoken', '{{ oViewConf.getSessionChallengeToken() }}');
 
-        fetch(shopSelfUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: headers,
-            body: formData
-        })
+        fetch(
+            shopSelfUrl,
+            {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: headers,
+                body: formData
+            }
+        )
         .then(response => {
             if (!response.ok) {
                 throw new Error(response.statusText);
