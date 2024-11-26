@@ -27,6 +27,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ModuleConfiguration extends ModuleConfiguration_parent
 {
@@ -193,10 +194,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
-    /**
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
-     */
     public function getApplePayPaymentProcessingKeyExists(): bool
     {
         $keyId = $this->moduleSettings->getApplePayPaymentKeyId();
@@ -215,10 +212,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         return false;
     }
 
-    /**
-     * @throws GuzzleException
-     * @throws FileException
-     */
     public function getApplePayPaymentProcessingCertExists(): bool
     {
         $certId = $this->moduleSettings->getApplePayPaymentCertificateId();
@@ -242,11 +235,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     }
 
     /**
-     * @return void
-     * @throws FileException
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
      */
-    public function saveConfVars()
+    public function saveConfVars(): void
     {
         $moduleId = $this->getUnzerStringRequestEscapedParameter('oxid');
         if ($moduleId === Module::MODULE_ID) {
@@ -269,9 +261,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         parent::saveConfVars();
     }
 
-    /**
-     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
-     */
     private function saveMerchantKey(string $systemMode): void
     {
         $errorIds = [
@@ -318,9 +307,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
-    /**
-     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
-     */
     private function savePaymentKey(string $systemMode): void
     {
         $errorIds = [
@@ -343,9 +329,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
-    /**
-     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
-     */
     private function savePaymentCert(string $systemMode): void
     {
         $errorIds = [

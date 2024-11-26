@@ -44,10 +44,6 @@ class OrderMain extends OrderMain_parent
         }
     }
 
-    /**
-     * @param Order $oOrder
-     * @return void
-     */
     public function sendShipmentNotification(Order $oOrder): void
     {
         $paymentService = $this->getServiceFromContainer(PaymentService::class);

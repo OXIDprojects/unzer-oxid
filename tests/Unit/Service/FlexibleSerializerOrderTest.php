@@ -2,22 +2,23 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
-use OxidSolutionCatalysts\Unzer\Model\Order;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\Eshop\Core\Field;
 use OxidSolutionCatalysts\Unzer\Service\FlexibleSerializer;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-class FlexibleSerializerOrderTest extends TestCase
+class FlexibleSerializerOrderTest extends IntegrationTestCase
 {
-    private $flexibleSerializer;
+    private FlexibleSerializer $flexibleSerializer;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         $this->flexibleSerializer = new FlexibleSerializer();
     }
 
-    private function createSerializedData(array $data): string
+    private function createSerializedData(mixed $data): string
     {
         $testData = new stdClass();
         foreach ($data as $key => $value) {
@@ -26,7 +27,7 @@ class FlexibleSerializerOrderTest extends TestCase
         return serialize($testData);
     }
 
-    public function testRestoreOrderFromStrClass(): void
+    public function testRestoreOrderFromStdClass(): void
     {
         // Prepare test data
         $testData = $this->createSerializedData([
@@ -39,6 +40,42 @@ class FlexibleSerializerOrderTest extends TestCase
         ]);
 
         // Execute method
+        $result = $this->flexibleSerializer->restoreOrderFromStrClass($testData);
+
+        // Verify result is Order instance with finalizeTmpOrder method
+        $this->assertInstanceOf(Order::class, $result);
+        $this->assertTrue(method_exists($result, 'finalizeTmpOrder'), 'Result should have finalizeTmpOrder method');
+
+        // Verify fields were set correctly using getFieldData
+        $this->assertEquals('testOrderId', $result->getFieldData('oxid'));
+        $this->assertEquals('12345', $result->getFieldData('oxordernr'));
+        $this->assertEquals('99.99', $result->getFieldData('oxtotalordersum'));
+        $this->assertEquals('2024-01-01 12:00:00', $result->getFieldData('oxorderdate'));
+        $this->assertEquals('John', $result->getFieldData('oxbillfname'));
+        $this->assertEquals('Doe', $result->getFieldData('oxbilllname'));
+    }
+
+    public function testRestoreOrderFromOrderClass(): void
+    {
+        $order = oxNew(Order::class);
+        $order = [
+            'oxid' => 'testOrderId',
+            'oxordernr' => '12345',
+            'oxtotalordersum' => '99.99',
+            'oxorderdate' => '2024-01-01 12:00:00',
+            'oxbillfname' => 'John',
+            'oxbilllname' => 'Doe'
+        ];
+
+        $testData = $this->createSerializedData($order);
+
+        $flexResult = $this->flexibleSerializer->safeSerialize($order);
+        $flexUnserialized = (array)$this->flexibleSerializer->safeUnserialize($flexResult);
+
+        $this->assertEquals('testOrderId', $flexUnserialized['oxid']);
+        $this->assertEquals('12345', $flexUnserialized['oxordernr']);
+        $this->assertEquals('99.99', $flexUnserialized['oxtotalordersum']);
+
         $result = $this->flexibleSerializer->restoreOrderFromStrClass($testData);
 
         // Verify result is Order instance with finalizeTmpOrder method

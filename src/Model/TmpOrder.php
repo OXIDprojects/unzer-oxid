@@ -139,8 +139,8 @@ class TmpOrder extends BaseModel
         $rawRes = $queryBuilder->execute();
         $result = $rawRes->fetchAssociative();
 
-        if (is_array($result) && isset($result['TMPORDER']) && is_string($result['TMPORDER'])) {
-            $tmpOrder = $result['TMPORDER'];
+        if (is_array($result) && isset($result['tmporder']) && is_string($result['tmporder'])) {
+            $tmpOrder = $result['tmporder'];
             $result = unserialize(base64_decode($tmpOrder));
             if (is_array($result) && isset($result['order']) && is_object($result['order'])) {
                 /** @var CoreOrderModel $order */

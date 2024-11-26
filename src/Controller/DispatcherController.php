@@ -177,6 +177,9 @@ class DispatcherController extends FrontendController
         return $this->translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function finalizeTmpOrder(
         Payment $unzerPayment,
         TmpOrder $tmpOrder,
@@ -184,15 +187,23 @@ class DispatcherController extends FrontendController
         bool $bError
     ): string {
         $return = $this->returnError();
-        if ($tmpOrder->load($tmpData['OXID'])) {
+        if ($tmpOrder->load($tmpData['oxid'])) {
             $flexibleSerializer = $this->getFlexibleSerializer();
-            $oOrder = $flexibleSerializer->safeUnserialize($tmpData['tmporder'], [Order::class]);
+
+            /** @var Order $oOrder */
+            $oOrder = $flexibleSerializer->safeUnserialize(
+                $tmpData['tmporder'],
+                [
+                    Order::class
+                ]
+            );
 
             if ($oOrder instanceof \stdClass || $oOrder === false) {
                 $oOrder = $flexibleSerializer->restoreOrderFromStrClass($tmpData['tmporder']);
             }
 
-            if ($oOrder instanceof Order) {
+            if (!is_null($oOrder) && method_exists($oOrder, 'finalizeTmpOrder')) {
+                /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
                 $oOrder->finalizeTmpOrder($unzerPayment, $bError);
                 $tmpOrder->assign(['status' => 'FINISHED']);
                 $tmpOrder->save();
@@ -229,6 +240,16 @@ class DispatcherController extends FrontendController
         return $this->getServiceFromContainer(Transaction::class);
     }
 
+    protected function returnError(): string
+    {
+        return $this->translator->translate('oscunzer_ERROR_HANDLE_TMP_ORDER');
+    }
+
+    protected function returnSuccess(): string
+    {
+        return $this->translator->translate('oscunzer_SUCCESS_HANDLE_TMP_ORDER');
+    }
+
     private function handleTmpOrder(Payment $unzerPayment): string
     {
         $tmpOrder = oxNew(TmpOrder::class);
@@ -236,8 +257,8 @@ class DispatcherController extends FrontendController
         $tmpData = $tmpOrder->getTmpOrderByUnzerId($orderId);
 
         if (
-            isset($tmpData['OXID']) &&
-            $tmpOrder->load($tmpData['OXID']) &&
+            isset($tmpData['oxid']) &&
+            $tmpOrder->load($tmpData['oxid']) &&
             $this->hasExceededTimeLimit($tmpOrder)
         ) {
             $bError = !(

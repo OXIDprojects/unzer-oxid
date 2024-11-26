@@ -442,14 +442,11 @@ class Payment
         return true;
     }
 
-    /**
-     * @param UnzerOrderModel|null $oOrder
-     * @param string $unzerid
-     * @param float $amount
-     * @return UnzerApiException|bool
-     */
-    public function doUnzerAuthorizationCancel($oOrder, $unzerid, $amount)
-    {
+    public function doUnzerAuthorizationCancel(
+        UnzerOrderModel|null $oOrder,
+        string $unzerid,
+        float $amount
+    ): UnzerApiException|bool {
         if (!($oOrder instanceof Order)) {
             return false;
         }
@@ -475,14 +472,12 @@ class Payment
     }
 
     /**
-     * @param UnzerOrderModel|null $oOrder
-     * @param string $sPaymentId
-     * @return UnzerApiException|bool
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function sendShipmentNotification($oOrder, $sPaymentId = null)
-    {
+    public function sendShipmentNotification(
+        ?Order $oOrder,
+        string $sPaymentId = null
+    ): Exception|bool|UnzerApiException {
         if (!($oOrder instanceof Order)) {
             return false;
         }
@@ -545,11 +540,7 @@ class Payment
         return $blSuccess;
     }
 
-    /**
-     * @param \UnzerSDK\Resources\Payment $unzerPayment
-     * @return BasePaymentType|AbstractUnzerResource The updated PaymentType object.
-     */
-    public function setInstallmentDueDate($unzerPayment)
+    public function setInstallmentDueDate(UnzerPayment $unzerPayment): BasePaymentType|AbstractUnzerResource
     {
         /** @var InstallmentSecured $installment */
         $installment = $unzerPayment->getPaymentType();
@@ -573,9 +564,6 @@ class Payment
         return date('Y-m-d', strtotime("+1 days"));
     }
 
-    /**
-     * @return bool
-     */
     public function isPdfSession(): bool
     {
         return (bool)Registry::getRequest()->getRequestParameter('pdfConfirm', '0');

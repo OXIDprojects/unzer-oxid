@@ -7,10 +7,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
 use ReflectionClass;
-use ReflectionException;
+use ReflectionMethod;
 use stdClass;
 
 class FlexibleSerializer
@@ -34,7 +33,7 @@ class FlexibleSerializer
      * @param array $allowedClasses An array of fully qualified class names that are allowed to be unserialized.
      * @return mixed The unserialized data.
      */
-    public function safeUnserialize($serialized, array $allowedClasses = [])
+    public function safeUnserialize(string $serialized, array $allowedClasses = [])
     {
         $unserializedData = unserialize(
             $serialized,
@@ -54,16 +53,27 @@ class FlexibleSerializer
         $unserializedData = unserialize(
             $serialized,
             [
-                'allowed_classes' => [stdClass::class, Order::class]
+                'allowed_classes' => [stdClass::class, Order ::class]
             ]
         );
 
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
         $order = $this->getOrderModel();
 
+        /**
+         * @var string $value
+         */
         foreach (get_object_vars($unserializedData) as $property => $value) {
-            if (property_exists($order, $property) || method_exists($order, 'setFieldData')) {
+            if (
+                property_exists($order, $property)
+                || method_exists($order, 'setFieldData')
+            ) {
+                $property = str_replace("\0", '', $property);
                 if (method_exists($order, 'setFieldData')) {
-                    $order->setFieldData($property, $value);
+                    $reflectionMethod = new ReflectionMethod($order, 'setFieldData');
+                    if ($reflectionMethod->isPublic()) {
+                        $order->setFieldData($property, $value);
+                    }
                 }
                 $order->$property = $value;
             }
@@ -106,11 +116,6 @@ class FlexibleSerializer
     }
 
     /**
-     * Restore unserializable data, including objects of allowed classes.
-     *
-     * @param mixed $data The data to be restored.
-     * @param array $allowedClasses An array of fully qualified class names that are allowed to be restored.
-     * @return mixed The restored data.
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -125,17 +130,11 @@ class FlexibleSerializer
         if (is_object($data) && isset($data->__class)) {
             $className = $data->__class;
             if ($this->isAllowedClass($className, $allowedClasses)) {
-                $reflection = new ReflectionClass($className);
-                $restored = $reflection->newInstanceWithoutConstructor();
+                $restored = new $className();
                 foreach (get_object_vars($data) as $key => $value) {
                     if ($key !== '__class') {
-                        if ($reflection->hasProperty($key)) {
-                            $property = $reflection->getProperty($key);
-                            $property->setAccessible(true);
-                            $property->setValue($restored, $this->restoreUnserializable($value, $allowedClasses));
-                        } else {
-                            $restored->$key = $this->restoreUnserializable($value, $allowedClasses);
-                        }
+                        $key = str_replace("\0", '', $key);
+                        $restored->$key = $this->restoreUnserializable($value, $allowedClasses);
                     }
                 }
                 return $restored;
@@ -146,6 +145,7 @@ class FlexibleSerializer
             $restored = new stdClass();
             foreach (get_object_vars($data) as $key => $value) {
                 if ($key !== '__class') {
+                    $key = str_replace("\0", '', $key);
                     $restored->$key = $this->restoreUnserializable($value, $allowedClasses);
                 }
             }

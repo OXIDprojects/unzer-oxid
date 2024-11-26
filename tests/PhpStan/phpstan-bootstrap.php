@@ -53,12 +53,7 @@ class_alias(
 
 class_alias(
     \OxidEsales\Eshop\Application\Model\Order::class,
-    \OxidEsales\Eshop\Application\Model\Order_parent::class,
-);
-
-class_alias(
-    \OxidEsales\Eshop\Application\Model\Order::class,
-    \OxidEsales\Eshop\Application\Model\Order::class,
+    \OxidSolutionCatalysts\Unzer\Model\Order_parent::class,
 );
 
 class_alias(

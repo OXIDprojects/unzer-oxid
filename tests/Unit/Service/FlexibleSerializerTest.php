@@ -7,15 +7,16 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
+use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidSolutionCatalysts\Unzer\Service\FlexibleSerializer;
 use PHPUnit\Framework\TestCase;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 
-class FlexibleSerializerTest extends TestCase
+class FlexibleSerializerTest extends IntegrationTestCase
 {
     private FlexibleSerializer $flexibleSerializer;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         $this->flexibleSerializer = new FlexibleSerializer();
     }
@@ -50,7 +51,7 @@ class FlexibleSerializerTest extends TestCase
             ['OxidEsales\Eshop\Application\Model\Order']
         );
 
-        $this->assertInstanceOf('OxidSolutionCatalysts\Unzer\Model\Order', $unserialized);
+        $this->assertInstanceOf('OxidEsales\Eshop\Application\Model\Order', $unserialized);
         $this->assertEquals(1, $unserialized->id);
         $this->assertEquals('John Doe', $unserialized->customerName);
         $this->assertEquals('Extra Info', $unserialized->extraField);
