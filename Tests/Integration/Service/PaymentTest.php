@@ -12,6 +12,7 @@ use OxidEsales\Eshop\Core\Session;
 use OxidEsales\TestingLibrary\UnitTestCase;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
+use OxidSolutionCatalysts\Unzer\Service\TmpOrderService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
@@ -40,7 +41,8 @@ class PaymentTest extends UnitTestCase
             $this->createPartialMock(Translator::class, []),
             $this->createPartialMock(UnzerService::class, []),
             $this->createPartialMock(UnzerSDKLoader::class, []),
-            $this->createPartialMock(TransactionService::class, [])
+            $this->createPartialMock(TransactionService::class, []),
+            $this->createPartialMock(TmpOrderService::class, [])
         );
 
         $this->assertSame($expectedResult, $sut->removeTemporaryOrder());

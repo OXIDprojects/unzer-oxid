@@ -13,11 +13,11 @@ use UnzerSDK\Resources\PaymentTypes\Sofort as UnzerSofort;
 
 class Sofort extends UnzerPayment
 {
-    protected $paymentMethod = 'sofort';
+    protected string $paymentMethod = 'sofort';
 
-    protected $allowedCurrencies = ['EUR'];
+    protected array $allowedCurrencies = ['EUR'];
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

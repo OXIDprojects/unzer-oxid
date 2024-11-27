@@ -20,6 +20,7 @@ use Exception;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 class ModuleSettings
 {
@@ -818,6 +819,7 @@ class ModuleSettings
         string $currency
     ): string {
         $key = '';
+        $customerType = $customerType === 'B2B' ? 'B2B' : 'B2C';
         if ($customerType === 'B2C' && $currency === 'EUR') {
             $key = $this->getInvoiceB2CEURPrivateKey();
         } elseif ($customerType === 'B2C' && $currency === 'CHF') {

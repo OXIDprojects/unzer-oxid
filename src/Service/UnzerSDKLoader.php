@@ -54,6 +54,9 @@ class UnzerSDKLoader
     public function getUnzerSDK(string $paymentId = '', string $currency = '', string $customerType = ''): Unzer
     {
         if (UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID === $paymentId) {
+            if (empty($customerType) || empty($currency)) {
+                throw new UnzerException('Customer type and currency must be set for invoice payment');
+            }
             $key = $this->moduleSettings->getInvoicePrivateKeyByCustomerTypeAndCurrency(
                 $customerType,
                 $currency

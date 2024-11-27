@@ -13,9 +13,9 @@ use UnzerSDK\Resources\PaymentTypes\Invoice;
 
 class InvoiceOld extends UnzerPayment
 {
-    protected $paymentMethod = 'invoice';
+    protected string $paymentMethod = 'invoice';
 
-    protected $allowedCurrencies = ['EUR', 'CHF'];
+    protected array $allowedCurrencies = ['EUR', 'CHF'];
 
     /**
      * @return BasePaymentType

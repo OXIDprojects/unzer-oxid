@@ -13,9 +13,9 @@ use UnzerSDK\Resources\PaymentTypes\Alipay as UnzerAlipay;
 
 class AliPay extends UnzerPayment
 {
-    protected $paymentMethod = 'alipay';
+    protected string $paymentMethod = 'alipay';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

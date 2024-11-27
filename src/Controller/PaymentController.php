@@ -172,10 +172,8 @@ class PaymentController extends PaymentController_parent
             $paymentId = is_string($paymentId) ? $paymentId : '';
             $currency = $tmpOrder->getFieldData('oxcurrency');
             $currency = is_string($currency) ? $currency : '';
-            $customerType = !empty($tmpOrder->getFieldData('oxdelcompany'))
-            || !empty($tmpOrder->getFieldData('oxbillcompany')) ?
-                'B2B' :
-                'B2C';
+
+            $customerType = $this->getCustomerTypeFromTmpOrder($tmpOrder);
 
             $result = $unzerSDK->getUnzerSDK(
                 $paymentId,
@@ -184,5 +182,19 @@ class PaymentController extends PaymentController_parent
             );
         }
         return $result;
+    }
+
+    private function getCustomerTypeFromTmpOrder(Order $tmpOrder): string
+    {
+        if (
+            empty($tmpOrder->getFieldData('oxdelcompany'))
+            && empty($tmpOrder->getFieldData('oxbillcompany'))
+            && empty($tmpOrder->oxorder__oxbillcompany->value)
+            && empty($tmpOrder->oxorder__oxdelcompany->value)
+        ) {
+            return 'B2C';
+        }
+
+        return 'B2B';
     }
 }

@@ -12,9 +12,9 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Ideal extends UnzerPayment
 {
-    protected $paymentMethod = 'ideal';
+    protected string $paymentMethod = 'ideal';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

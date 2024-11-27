@@ -12,14 +12,13 @@ class OrderList extends OrderList_parent
     use Request;
 
     /**
-     * Adding folder check
-    * bi *
-     * @param array  $whereQuery SQL condition array
-     * @param string $fullQuery  SQL query string
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
      *
      * @return string
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     *
      */
     protected function _prepareWhereQuery($whereQuery, $fullQuery)
     {

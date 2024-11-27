@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Controller;
 
-use OxidSolutionCatalysts\Unzer\Model\Order;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Service\FlexibleSerializer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
 use PHPUnit\Framework\MockObject\MockObject;

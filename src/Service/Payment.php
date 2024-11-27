@@ -29,6 +29,7 @@ use UnzerSDK\Resources\Payment as UnzerPayment;
 use UnzerSDK\Resources\AbstractUnzerResource;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
+use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\PaymentTypes\Prepayment as UnzerSDKPrepayment;
 use UnzerSDK\Resources\PaymentTypes\Invoice as UnzerSDKInvoice;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
@@ -52,39 +53,24 @@ class Payment
     public const STATUS_ERROR = "ERROR";
 
     protected Session $session;
-
     protected PaymentExtensionLoader $paymentExtLoader;
-
     protected Translator $translator;
-
     protected Unzer $unzerService;
-
     protected UnzerSDKLoader $unzerSDKLoader;
-
     protected ?UnzerPayment $sessionUnzerPayment = null;
-
-
     protected string $redirectUrl = '';
-
     protected string $pdfLink = '';
-
     protected Transaction $transactionService;
+    private TmpOrderServiceInterface $tmpOrderService;
 
-    /**
-     * @param Session $session
-     * @param PaymentExtensionLoader $paymentExtLoader
-     * @param Translator $translator
-     * @param Unzer $unzerService
-     * @param UnzerSDKLoader $unzerSDKLoader
-     * @param TransactionService $transactionService
-     */
     public function __construct(
         Session $session,
         PaymentExtensionLoader $paymentExtLoader,
         Translator $translator,
         Unzer $unzerService,
         UnzerSDKLoader $unzerSDKLoader,
-        TransactionService $transactionService
+        TransactionService $transactionService,
+        TmpOrderServiceInterface $tmpOrderService
     ) {
         $this->session = $session;
         $this->paymentExtLoader = $paymentExtLoader;
@@ -92,6 +78,7 @@ class Payment
         $this->unzerService = $unzerService;
         $this->unzerSDKLoader = $unzerSDKLoader;
         $this->transactionService = $transactionService;
+        $this->tmpOrderService = $tmpOrderService;
     }
 
     /**
@@ -212,7 +199,6 @@ class Payment
     }
 
     /**
-     * @return string
      * @throws UnzerApiException
      */
     public function getUnzerOrderId(): string
@@ -229,11 +215,8 @@ class Payment
     }
 
     /**
-     * @param string $paymentId
-     * @param string $currency
-     * @param string $customerType
-     * @return \UnzerSDK\Unzer
-    */
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
+     */
     protected function getUnzerSDK(
         string $paymentId = '',
         string $currency = '',
@@ -243,8 +226,6 @@ class Payment
     }
 
     /**
-     * @param bool $noCache
-     * @return UnzerPayment|null
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function getSessionUnzerPayment(bool $noCache = false): ?UnzerPayment
@@ -265,13 +246,18 @@ class Payment
             if ($sessionOrderId == null) {
                 return null;
             }
-            /** @var Order $order */
-            $order = oxNew(Order::class);
-            $order->load($sessionOrderId);
 
-            $paymentType = $this->getPaymentType($sessionOrderId, $order);
-            $currency = $this->getOrderCurrency($sessionOrderId, $order, $paymentType);
-            $customerType = $this->getCustomerType($currency, $paymentType);
+            $order = $this->tmpOrderService->getOrderBySessionOrderId($sessionOrderId);
+
+            $paymentType = '';
+            $currency = '';
+            $customerType = '';
+
+            if ($order !== null) {
+                $paymentType = $this->tmpOrderService->getPaymentType($sessionOrderId, $order);
+                $currency = $this->tmpOrderService->getOrderCurrency($sessionOrderId, $order, $paymentType);
+                $customerType = $this->tmpOrderService->getCustomerType($currency, $paymentType);
+            }
 
             try {
                 $result = $this->unzerSDKLoader->getUnzerSDK(
@@ -288,62 +274,6 @@ class Payment
         }
 
         return $result;
-    }
-
-    private function getCustomerType(?string $currency, string $paymentType): string
-    {
-        $customerType = 'B2C';
-
-        if (($currency !== null) && $this->isPaylaterInvoice($paymentType)) {
-            $customerInRequest = $this->getUnzerStringRequestParameter('unzer_customer_type');
-            if ($customerInRequest !== 'B2C') {
-                $customerType = 'B2B';
-            }
-        }
-        return $customerType;
-    }
-
-    private function isPaylaterInvoice(string $paymentType): bool
-    {
-        return in_array($paymentType, [
-            UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID,
-            UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID,
-            UnzerDefinitions::INSTALLMENT_UNZER_PAYMENT_ID,
-        ], true);
-    }
-
-    private function getOrderCurrency(string $sessionOrderId, Order $order, string $paymentType): string
-    {
-        /** @var string $currency */
-        $currency = $order->getFieldData('oxcurrency') ?? '';
-
-        if ($this->isPaylaterInvoice($paymentType)) {
-            $tmpOrder = oxNew(TmpOrder::class)->getTmpOrderByOxOrderId($sessionOrderId);
-            if ($tmpOrder !== null) {
-                /** @var stdClass{name: string} $orderCurrency */
-                $orderCurencyStdCls = $tmpOrder->getOrderCurrency();
-                $currency = $orderCurencyStdCls->name;
-            }
-        }
-        return $currency;
-    }
-
-    private function getPaymentType(string $sessionOrderId, Order $order): string
-    {
-        $paymentType = $order->getFieldData('oxpaymenttype');
-
-        if (empty($paymentType)) {
-            $tmpOrder = oxNew(TmpOrder::class)->getTmpOrderByOxOrderId($sessionOrderId);
-            if ($tmpOrder !== null) {
-                $paymentType = $tmpOrder->getFieldData('oxpaymenttype');
-            }
-        }
-
-        if (is_string($paymentType)) {
-            return $paymentType;
-        }
-
-        return '';
     }
 
     /**
@@ -581,7 +511,8 @@ class Payment
             return false;
         }
 
-        return $sessionPayment->getPaymentType() instanceof UnzerSDKInvoice;
+        return $sessionPayment->getPaymentType() instanceof UnzerSDKInvoice
+            || $sessionPayment->getPaymentType() instanceof PaylaterInvoice;
     }
 
     public function isPrepayment(): bool

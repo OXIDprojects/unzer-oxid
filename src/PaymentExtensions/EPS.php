@@ -12,9 +12,9 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class EPS extends UnzerPayment
 {
-    protected $paymentMethod = 'eps';
+    protected string $paymentMethod = 'eps';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

@@ -12,9 +12,9 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Card extends UnzerPayment
 {
-    protected $paymentMethod = 'card';
+    protected string $paymentMethod = 'card';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType
