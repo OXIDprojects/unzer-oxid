@@ -2,9 +2,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
+use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Model\Payment;
+
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidSolutionCatalysts\Unzer\Service\BasketPayableService;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +38,9 @@ class BasketPayableServiceTest extends TestCase
         $minimalPayment = 50;
 
         $this->basketMock->method('getBruttoSum')->willReturn($bruttoSum);
-        $this->paymentMock->method('getFieldData')->with('oxpayments__oxfromamount')->willReturn($minimalPayment);
+        $this->paymentMock->method('getFieldData')
+            ->with('oxpayments__oxfromamount')
+            ->willReturn($minimalPayment);
 
         $this->sessionMock->method('getBasket')->willReturn($this->basketMock);
 
@@ -55,7 +58,9 @@ class BasketPayableServiceTest extends TestCase
         $minimalPayment = 50;
 
         $this->basketMock->method('getBruttoSum')->willReturn($bruttoSum);
-        $this->paymentMock->method('getFieldData')->with('oxpayments__oxfromamount')->willReturn($minimalPayment);
+        $this->paymentMock->method('getFieldData')
+            ->with('oxpayments__oxfromamount')
+            ->willReturn($minimalPayment);
 
         $this->sessionMock->method('getBasket')->willReturn($this->basketMock);
 
@@ -73,7 +78,9 @@ class BasketPayableServiceTest extends TestCase
         $minimalPayment = 1;
 
         $this->basketMock->method('getBruttoSum')->willReturn($bruttoSum);
-        $this->paymentMock->method('getFieldData')->with('oxpayments__oxfromamount')->willReturn($minimalPayment);
+        $this->paymentMock->method('getFieldData')
+            ->with('oxpayments__oxfromamount')
+            ->willReturn($minimalPayment);
 
         $this->sessionMock->method('getBasket')->willReturn($this->basketMock);
 
@@ -91,7 +98,9 @@ class BasketPayableServiceTest extends TestCase
         $minimalPayment = CoreUnzerDefinitions::MINIMAL_PAYABLE_AMOUNT;
 
         $this->basketMock->method('getBruttoSum')->willReturn($bruttoSum);
-        $this->paymentMock->method('getFieldData')->with('oxpayments__oxfromamount')->willReturn($minimalPayment);
+        $this->paymentMock->method('getFieldData')
+            ->with('oxpayments__oxfromamount')
+            ->willReturn($minimalPayment);
 
         $this->sessionMock->method('getBasket')->willReturn($this->basketMock);
 

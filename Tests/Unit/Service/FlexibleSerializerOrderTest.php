@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
-use OxidSolutionCatalysts\Unzer\Model\Order;
-use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Service\FlexibleSerializer;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class FlexibleSerializerOrderTest extends TestCase
 {
-    private $flexibleSerializer;
+    private ?FlexibleSerializer $flexibleSerializer;
 
     protected function setUp(): void
     {

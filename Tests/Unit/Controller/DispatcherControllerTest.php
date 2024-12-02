@@ -31,7 +31,7 @@ class DispatcherControllerTest extends TestCase
             'OXID' => 'testTmpOrderId',
             'TMPORDER' => base64_encode(serialize(['order' => $order]))
         ];
-
+        /** @var DispatcherController $controller */
         $controller = $this->getDispatcherControllerPartialMock();
 
         $result = $controller->finalizeTmpOrder($paymentMock, $tmpOrderMock, $tmpData, false);

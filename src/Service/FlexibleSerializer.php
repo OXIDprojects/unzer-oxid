@@ -60,6 +60,10 @@ class FlexibleSerializer
 
         $order = $this->getOrderModel();
 
+        if (!$unserializedData) {
+            return $order;
+        }
+
         foreach (get_object_vars($unserializedData) as $property => $value) {
             if (property_exists($order, $property) || method_exists($order, 'setFieldData')) {
                 if (method_exists($order, 'setFieldData')) {
