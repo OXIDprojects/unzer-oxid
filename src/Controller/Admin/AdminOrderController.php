@@ -453,42 +453,29 @@ class AdminOrderController extends AdminDetailsController
 
     public function canCollectFully(): bool
     {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
         return $this->oPayment->canCollectFully();
     }
+
     public function canCollectPartially(): bool
     {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
         return $this->oPayment->canCollectPartially();
     }
+
     public function canRefundFully(): bool
     {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
         return $this->oPayment->canRefundFully();
     }
+
     public function canRefundPartially(): bool
     {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
-        return $this->oPayment->canRefundPartially();
+        /** This is fix for phpStan */
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment */
+        $payment = $this->oPayment;
+        return $payment->canRefundPartially();
     }
+
     public function canRevertPartially(): bool
     {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
         return $this->oPayment->canRevertPartially();
     }
 

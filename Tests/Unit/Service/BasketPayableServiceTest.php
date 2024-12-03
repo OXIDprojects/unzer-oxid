@@ -5,7 +5,6 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
-
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidSolutionCatalysts\Unzer\Service\BasketPayableService;
 use PHPUnit\Framework\TestCase;
