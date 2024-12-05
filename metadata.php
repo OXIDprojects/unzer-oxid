@@ -224,13 +224,6 @@ $aModule = [
         ],
         [
             'group' => 'unzerapplepay',
-            'name' => 'UnzerOption_oscunzer_applepay',
-            'type' => 'select',
-            'value' => '0',
-            'constraints' => '0'
-        ],
-        [
-            'group' => 'unzerapplepay',
             'name' => 'applepay_merchant_capabilities',
             'type' => 'aarr',
             'value' => ModuleSettings::APPLE_PAY_MERCHANT_CAPABILITIES
