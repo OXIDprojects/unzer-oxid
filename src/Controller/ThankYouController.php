@@ -69,7 +69,7 @@ class ThankYouController extends ThankYouController_parent
         return $result;
     }
 
-    /** Template variable getter. Returns Unzer PrePayment Holder */
+    /** Template variable getter. Returns Unzer PrePayment Descriptor */
     public function getUnzerPrePaymentDescriptor(): ?string
     {
         $result = null;
