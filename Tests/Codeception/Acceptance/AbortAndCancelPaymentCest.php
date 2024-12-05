@@ -61,7 +61,8 @@ final class AbortAndCancelPaymentCest extends BaseCest
         // login page
         $I->makeScreenshot("before_back");
         $I->waitForElement($this->loginInput);
-        $I->amOnPage(Configuration::config()['modules']['config']['WebDriver']['url'] . $currentUrl);
+
+        $I->amOnPage($currentUrl);
         $templateString = Translator::translate('OSCUNZER_CANCEL_DURING_CHECKOUT');
         $I->wait(60);
         $I->makeScreenshot("after_back");

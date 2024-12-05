@@ -31,7 +31,8 @@
     "squizlabs/php_codesniffer": "3.*",
     "phpstan/phpstan": "^1.9.2",
     "phpmd/phpmd": "^2.11",
-    "oxid-esales/oxideshop-ce": "dev-b-6.3.x"
+    "oxid-esales/oxideshop-ce": "dev-b-6.3.x",
+    "phpunit/php-code-coverage": "*"
   },
   "conflicts": {
     "oxid-esales/oxideshop-ce": "<6.8 | ^7.0"

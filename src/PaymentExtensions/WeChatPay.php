@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -13,9 +15,9 @@ use UnzerSDK\Resources\PaymentTypes\Wechatpay as UnzerWechatpay;
 
 class WeChatPay extends UnzerPayment
 {
-    protected $paymentMethod = 'wechatpay';
+    protected string $paymentMethod = 'wechatpay';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

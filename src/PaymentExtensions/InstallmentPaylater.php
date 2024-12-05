@@ -11,8 +11,8 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class InstallmentPaylater extends UnzerPayment
 {
-    protected $paymentMethod = 'paylater-installment';
-    protected $needPending = true;
+    protected string $paymentMethod = 'paylater-installment';
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

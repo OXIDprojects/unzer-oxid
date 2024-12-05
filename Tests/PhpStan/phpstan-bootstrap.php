@@ -7,9 +7,16 @@ class_alias(
     \OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration_parent::class
 );
 
+
 class_alias(
     \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class,
     \OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain_parent::class
+);
+
+
+class_alias(
+    \OxidEsales\Eshop\Application\Controller\PaymentController::class,
+    \OxidSolutionCatalysts\Unzer\Controller\PaymentController_parent::class
 );
 
 class_alias(
@@ -30,10 +37,6 @@ class_alias(
 class_alias(
     \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class,
     \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminDetailsController_parent::class
-);
-class_alias(
-    \OxidEsales\Eshop\Application\Controller\PaymentController::class,
-    \OxidSolutionCatalysts\Unzer\Controller\PaymentController_parent::class
 );
 
 class_alias(
@@ -57,14 +60,16 @@ class_alias(
 );
 
 class_alias(
-    \OxidEsales\Eshop\Application\Model\Order::class,
-    \OxidSolutionCatalysts\Unzer\Model\Order_parent::class,
-);
-
-class_alias(
     \OxidEsales\Eshop\Application\Model\Payment::class,
     \OxidSolutionCatalysts\Unzer\Model\Payment_parent::class
 );
+
+
+class_alias(
+    \OxidEsales\Eshop\Application\Model\Order::class,
+    \OxidSolutionCatalysts\Unzer\Model\Order_parent::class
+);
+
 
 class_alias(
     \OxidEsales\Eshop\Application\Model\DiscountList::class,

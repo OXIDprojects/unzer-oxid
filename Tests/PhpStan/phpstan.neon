@@ -8,3 +8,14 @@ parameters:
         - ../../vendor/oxid-esales/oxideshop-ce/source/overridablefunctions.php
     ignoreErrors:
         - identifier: missingType.iterableValue
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::createTmpOrder\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::markUnzerOrderAsPaid\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::getUnzerInvoiceNr\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::setUnzerTransId\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::finalizeTmpOrder\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Payment::canCollectFully\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Payment::canCollectPartially\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Payment::canRefundFully\(\)#'
+
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Payment::canRevertPartially\(\)#'
+        - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Payment::isUnzerSecuredPayment\(\)#'

@@ -7,7 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Model;
 
-use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidEsales\TestingLibrary\UnitTestCase;

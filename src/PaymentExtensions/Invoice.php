@@ -14,15 +14,14 @@ use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice as UnzerPaylaterInvoice;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Registry;
 
 class Invoice extends UnzerPayment
 {
     use Request;
 
-    protected $paymentMethod = 'paylater-invoice';
+    protected string $paymentMethod = 'paylater-invoice';
 
-    protected $allowedCurrencies = ['EUR', 'CHF'];
+    protected array $allowedCurrencies = ['EUR', 'CHF'];
 
     /**
      * @return BasePaymentType

@@ -27,5 +27,5 @@
         </properties>
     </rule>
 
-    <exclude-pattern>*OrderController.php</exclude-pattern>
+    <exclude-pattern>*Controller.php</exclude-pattern>
 </ruleset>

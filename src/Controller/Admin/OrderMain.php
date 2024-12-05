@@ -6,7 +6,7 @@ use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
-use OxidSolutionCatalysts\Unzer\Model\Order;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 
@@ -15,11 +15,11 @@ class OrderMain extends OrderMain_parent
     use ServiceContainer;
 
     /**
-     * Method is used for overriding.
-     *
-     * @return void
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
      */
-    protected function onOrderSend()
+    protected function onOrderSend(): void
     {
         $sOxid = $this->getEditObjectId();
         $oOrder = oxNew(Order::class);
@@ -38,8 +38,9 @@ class OrderMain extends OrderMain_parent
     }
 
     /**
-     * @param Order $oOrder
-     * @return void
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
      */
     public function sendShipmentNotification(Order $oOrder): void
     {

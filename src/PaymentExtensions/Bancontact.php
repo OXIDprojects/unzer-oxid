@@ -13,9 +13,9 @@ use UnzerSDK\Resources\PaymentTypes\Bancontact as UnzerBancontact;
 
 class Bancontact extends UnzerPayment
 {
-    protected $paymentMethod = 'bancontact';
+    protected string $paymentMethod = 'bancontact';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

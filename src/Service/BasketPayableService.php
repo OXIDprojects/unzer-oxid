@@ -9,7 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidEsales\Eshop\Application\Model\Payment;
 
 class BasketPayableService
 {

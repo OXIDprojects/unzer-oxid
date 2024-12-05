@@ -10,6 +10,8 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Service;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentSessionService;
+use OxidSolutionCatalysts\Unzer\Service\TmpOrderService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use PHPUnit\Framework\TestCase;
@@ -39,7 +41,9 @@ class PaymentExtensionLoaderTest extends TestCase
             $this->getMockBuilder(Unzer::class)
                 ->disableOriginalConstructor()
                 ->getMock(),
-            $this->logger
+            $this->logger,
+            $this->createMock(SavedPaymentSessionService::class),
+            $this->createMock(TmpOrderService::class)
         );
 
         $loadedPaymentType = $sut->getPaymentExtension($paymentStub);

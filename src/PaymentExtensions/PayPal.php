@@ -13,9 +13,9 @@ use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerPaypal;
 
 class PayPal extends UnzerPayment
 {
-    protected $paymentMethod = 'paypal';
+    protected string $paymentMethod = 'paypal';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

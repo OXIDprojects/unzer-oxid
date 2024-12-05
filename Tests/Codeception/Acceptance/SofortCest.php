@@ -38,7 +38,6 @@ final class SofortCest extends BaseCest
     public function _before(AcceptanceTester $I): void
     {
         parent::_before($I);
-        $I->resetCookie([]);
     }
 
     /**

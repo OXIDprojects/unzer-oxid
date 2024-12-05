@@ -12,7 +12,7 @@ jobs:
   install_shop_with_module:
     strategy:
       matrix:
-        php: [ '7.4' ]
+        php: [ '7.4', '8.1' ]
     runs-on: ubuntu-latest
     steps:
       - name: Cleanup workspace
@@ -170,7 +170,7 @@ jobs:
   unit_tests:
     strategy:
       matrix:
-        php: [ '7.4' ]
+        php: [ '7.4', '8.1' ]
     needs: [ install_shop_with_module ]
     runs-on: ubuntu-latest
     steps:
@@ -228,7 +228,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ '7.4' ]
+        php: [ '7.4', '8.1' ]
         group:
           [
             'PaymentAvailableTest',

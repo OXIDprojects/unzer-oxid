@@ -38,6 +38,13 @@ class PrePaymentBankAccountService
                 $charge->getHolder()
             );
         }
+
+        if ($charge->getDescriptor()) {
+            $this->session->setVariable(
+                $this->getSessionVariableName((string) $charge->getOrderId(), 'descriptor'),
+                $charge->getDescriptor()
+            );
+        }
     }
 
     public function getIban(string $unzerOrderNumber): ?string
@@ -58,6 +65,13 @@ class PrePaymentBankAccountService
     {
         return $this->getStringVarFromSession(
             $this->getSessionVariableName($unzerOrderNumber, 'holder')
+        );
+    }
+
+    public function getDescriptor(string $unzerOrderNumber): ?string
+    {
+        return $this->getStringVarFromSession(
+            $this->getSessionVariableName($unzerOrderNumber, 'descriptor')
         );
     }
 

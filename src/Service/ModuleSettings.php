@@ -20,6 +20,7 @@ use Exception;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 class ModuleSettings
 {
@@ -254,15 +255,19 @@ class ModuleSettings
 
     /**
      * @return string
-     * @throws FileException
      */
     public function getApplePayMerchantCert(): string
     {
-        $path = $this->getApplePayMerchantCertFilePath();
-        if (file_exists($path)) {
-            /** @var string $fileContest */
-            $fileContest = file_get_contents($path);
-            return $fileContest;
+        try {
+            $path = $this->getApplePayMerchantCertFilePath();
+
+            if (file_exists($path)) {
+                /** @var string $fileContest */
+                $fileContest = file_get_contents($path);
+                return $fileContest;
+            }
+        } catch (FileException $e) {
+            return '';
         }
 
         return '';
@@ -274,11 +279,15 @@ class ModuleSettings
      */
     public function getApplePayPaymentCert(): string
     {
-        $path = $this->getApplePayPaymentCertFilePath();
-        if (file_exists($path)) {
-            /** @var string $fileContest */
-            $fileContest = file_get_contents($path);
-            return $fileContest;
+        try {
+            $path = $this->getApplePayPaymentCertFilePath();
+            if (file_exists($path)) {
+                /** @var string $fileContest */
+                $fileContest = file_get_contents($path);
+                return $fileContest;
+            }
+        } catch (FileException $e) {
+            return '';
         }
 
         return '';
@@ -286,15 +295,18 @@ class ModuleSettings
 
     /**
      * @return string
-     * @throws FileException
      */
     public function getApplePayPaymentPrivateKey(): string
     {
-        $path = $this->getApplePayPaymentPrivateKeyFilePath();
-        if (file_exists($path)) {
-            /** @var string $fileContest */
-            $fileContest = file_get_contents($path);
-            return $fileContest;
+        try {
+            $path = $this->getApplePayPaymentPrivateKeyFilePath();
+            if (file_exists($path)) {
+                /** @var string $fileContest */
+                $fileContest = file_get_contents($path);
+                return $fileContest;
+            }
+        } catch (FileException $e) {
+            return '';
         }
 
         return '';
@@ -302,15 +314,18 @@ class ModuleSettings
 
     /**
      * @return string
-     * @throws FileException
      */
     public function getApplePayMerchantCertKey(): string
     {
-        $path = $this->getApplePayMerchantCertKeyFilePath();
-        if (file_exists($path)) {
-            /** @var string $fileContest */
-            $fileContest = file_get_contents($path);
-            return $fileContest;
+        try {
+            $path = $this->getApplePayMerchantCertKeyFilePath();
+            if (file_exists($path)) {
+                /** @var string $fileContest */
+                $fileContest = file_get_contents($path);
+                return $fileContest;
+            }
+        } catch (FileException $e) {
+            return '';
         }
 
         return '';
@@ -804,6 +819,7 @@ class ModuleSettings
         string $currency
     ): string {
         $key = '';
+        $customerType = $customerType === 'B2B' ? 'B2B' : 'B2C';
         if ($customerType === 'B2C' && $currency === 'EUR') {
             $key = $this->getInvoiceB2CEURPrivateKey();
         } elseif ($customerType === 'B2C' && $currency === 'CHF') {

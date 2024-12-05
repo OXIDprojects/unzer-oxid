@@ -5,11 +5,15 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Exception;
 
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentSessionService;
+use OxidSolutionCatalysts\Unzer\Service\TmpOrderService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use PHPUnit\Framework\TestCase;
 use UnzerSDK\Resources\Basket;
@@ -58,7 +62,9 @@ class UnzerPaymentTest extends TestCase
                 $unzerServiceMock,
                 new \OxidSolutionCatalysts\Unzer\Service\DebugHandler(
                     $this->createMock(\Monolog\Logger::class)
-                )
+                ),
+                $this->createMock(SavedPaymentSessionService::class),
+                $this->createMock(TmpOrderService::class)
             ],
             '',
             true,

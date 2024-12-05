@@ -11,7 +11,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Traits\Request;
-use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidEsales\Eshop\Application\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\Payment as UnzerPaymentService;
@@ -43,17 +43,8 @@ class AdminOrderController extends AdminDetailsController
     use ServiceContainer;
     use Request;
 
-    /**
-     * Active order object
-     *
-     * @var Order $editObject
-     */
-    protected $editObject = null;
-
-    /** @var Payment $oPayment */
-    protected $oPayment = null;
-
-    /** @var string $sTypeId */
+    protected ?Order $editObject = null;
+    protected Payment $oPayment;
     protected string $sTypeId;
 
     /**
@@ -462,42 +453,29 @@ class AdminOrderController extends AdminDetailsController
 
     public function canCollectFully(): bool
     {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
         return $this->oPayment->canCollectFully();
     }
+
     public function canCollectPartially(): bool
     {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
         return $this->oPayment->canCollectPartially();
     }
+
     public function canRefundFully(): bool
     {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
         return $this->oPayment->canRefundFully();
     }
+
     public function canRefundPartially(): bool
     {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
-        return $this->oPayment->canRefundPartially();
+        /** This is fix for phpStan */
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment */
+        $payment = $this->oPayment;
+        return $payment->canRefundPartially();
     }
+
     public function canRevertPartially(): bool
     {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
         return $this->oPayment->canRevertPartially();
     }
 
@@ -512,11 +490,7 @@ class AdminOrderController extends AdminDetailsController
 
         return $this->oPayment->isUnzerSecuredPayment();
     }
-    /**
-     * Returns editable order object
-     *
-     * @return Order|null
-     */
+
     public function getEditObject(): ?object
     {
         $soxId = $this->getEditObjectId();

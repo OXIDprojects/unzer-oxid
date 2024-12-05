@@ -16,6 +16,7 @@ use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentSessionService;
+use OxidSolutionCatalysts\Unzer\Service\TmpOrderService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -50,32 +51,25 @@ abstract class UnzerPayment
     use ServiceContainer;
     use Request;
 
-    /** @var Unzer */
-    protected $unzerSDK;
+    protected Unzer $unzerSDK;
 
-    /** @var UnzerService */
-    protected $unzerService;
+    protected UnzerService $unzerService;
 
-    /** @var string */
-    protected $unzerOrderId = '';
+    protected string $unzerOrderId = '';
 
-    /** @var string */
-    protected $paymentMethod = '';
+    protected string $paymentMethod = '';
 
-    /** @var bool */
-    protected $needPending = false;
+    protected bool $needPending = false;
 
-    /** @var bool */
-    protected $ajaxResponse = false;
+    protected bool $ajaxResponse = false;
 
-    /** @var array */
-    protected $allowedCurrencies = [];
+    protected array $allowedCurrencies = [];
 
-    /** @var DebugHandler $logger */
-    private $logger;
+    private DebugHandler $logger;
 
-    /** @var SavedPaymentSessionService $savedPaymentSessionService */
-    private $savedPaymentSessionService;
+    private SavedPaymentSessionService $savedPaymentSessionService;
+
+    private TmpOrderService $tmpOrderService;
 
     /**
      * @throws Exception
@@ -83,7 +77,9 @@ abstract class UnzerPayment
     public function __construct(
         Unzer $unzerSDK,
         UnzerService $unzerService,
-        DebugHandler $logger
+        DebugHandler $logger,
+        SavedPaymentSessionService $savedPaymentSessionService,
+        TmpOrderService $tmpOrderService
     ) {
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
@@ -92,28 +88,20 @@ abstract class UnzerPayment
 
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
         $this->logger = $logger;
-        $this->savedPaymentSessionService = $this->getServiceFromContainer(SavedPaymentSessionService::class);
+        $this->savedPaymentSessionService = $savedPaymentSessionService;
+        $this->tmpOrderService = $tmpOrderService;
     }
 
-    /**
-     * @return array
-     */
     public function getPaymentCurrencies(): array
     {
         return $this->allowedCurrencies;
     }
 
-    /**
-     * @return bool
-     */
     public function redirectUrlNeedPending(): bool
     {
         return $this->needPending;
     }
 
-    /**
-     * @return BasePaymentType
-     */
     abstract public function getUnzerPaymentTypeObject(): BasePaymentType;
 
     /**
@@ -208,11 +196,14 @@ abstract class UnzerPayment
             );
             $auth->setRiskData($uzrRiskData);
             $sdkPaymentID = UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID;
+            $customerType = $this->tmpOrderService
+                ->getCustomerType($currency->name, $sdkPaymentID);
             try {
                 $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
                 $UnzerSdk = $loader->getUnzerSDK(
                     $sdkPaymentID,
-                    $currency->name
+                    $currency->name,
+                    $customerType
                 );
                 $transaction = $UnzerSdk->performAuthorization(
                     $auth,
@@ -429,7 +420,7 @@ abstract class UnzerPayment
                 false,
                 null,
                 null,
-                \UnzerSDK\Constants\RecurrenceTypes::ONE_CLICK
+                RecurrenceTypes::ONE_CLICK
             );
         }
 

@@ -29,6 +29,7 @@ use OxidSolutionCatalysts\Unzer\PaymentExtensions\SepaSecured;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Sofort;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\WeChatPay;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentSessionService;
 
 class PaymentExtensionLoader
 {
@@ -54,30 +55,29 @@ class PaymentExtensionLoader
         UnzerDefinitions::WECHATPAY_UNZER_PAYMENT_ID => WeChatPay::class,
     ];
 
-    /**
-     * @var UnzerSDKLoader
-     */
-    private $unzerSdkLoader;
+    private UnzerSDKLoader $unzerSdkLoader;
 
-    /**
-     * @var Unzer
-     */
-    private $unzerService;
+    private Unzer $unzerService;
 
     private DebugHandler $logger;
 
-    /**
-     * @param UnzerSDKLoader $unzerSDKLoader
-     * @param Unzer $unzerService
-     */
+    private SavedPaymentSessionService $paymentSession;
+
+    private TmpOrderService $tmpOrderService;
+
+
     public function __construct(
         UnzerSDKLoader $unzerSDKLoader,
         Unzer $unzerService,
-        DebugHandler $logger
+        DebugHandler $logger,
+        SavedPaymentSessionService $paymentSession,
+        TmpOrderService $tmpOrderService
     ) {
         $this->unzerSdkLoader = $unzerSDKLoader;
         $this->unzerService = $unzerService;
         $this->logger = $logger;
+        $this->paymentSession = $paymentSession;
+        $this->tmpOrderService = $tmpOrderService;
     }
 
     /**
@@ -85,8 +85,6 @@ class PaymentExtensionLoader
      * need functions of the SDK. The SDK must always be loaded with the correct credentials. This is only
      * guaranteed if method getPaymentExtensionByCustomerTypeAndCurrency is used, as only this loads the SDK
      * with the correct credentials at all times
-     * @param PaymentModel $payment
-     * @return AbstractUnzerPayment
      */
     public function getPaymentExtension(PaymentModel $payment): AbstractUnzerPayment
     {
@@ -94,7 +92,9 @@ class PaymentExtensionLoader
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
             $this->unzerSdkLoader->getUnzerSDK(),
             $this->unzerService,
-            $this->logger
+            $this->logger,
+            $this->paymentSession,
+            $this->tmpOrderService
         );
     }
 
@@ -120,7 +120,9 @@ class PaymentExtensionLoader
                 $customerType
             ),
             $this->unzerService,
-            $this->logger
+            $this->logger,
+            $this->paymentSession,
+            $this->tmpOrderService
         );
     }
 }

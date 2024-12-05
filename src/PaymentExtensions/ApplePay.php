@@ -11,11 +11,11 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class ApplePay extends UnzerPayment
 {
-    protected $paymentMethod = 'applepay';
+    protected string $paymentMethod = 'applepay';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
-    protected $ajaxResponse = true;
+    protected bool $ajaxResponse = false;
 
     /**
      * @return BasePaymentType

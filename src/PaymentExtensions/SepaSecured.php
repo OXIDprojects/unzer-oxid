@@ -12,9 +12,9 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class SepaSecured extends UnzerPayment
 {
-    protected $paymentMethod = 'sepa-direct-debit-secured';
+    protected string $paymentMethod = 'sepa-direct-debit-secured';
 
-    protected $allowedCurrencies = ['EUR'];
+    protected array $allowedCurrencies = ['EUR'];
 
     /**
      * @return BasePaymentType

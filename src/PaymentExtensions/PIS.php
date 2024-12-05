@@ -13,9 +13,9 @@ use UnzerSDK\Resources\PaymentTypes\PIS as UnzerPIS;
 
 class PIS extends UnzerPayment
 {
-    protected $paymentMethod = 'pis';
+    protected string $paymentMethod = 'pis';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

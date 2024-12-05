@@ -11,9 +11,9 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Installment extends UnzerPayment
 {
-    protected $paymentMethod = 'installment-secured';
+    protected string $paymentMethod = 'installment-secured';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

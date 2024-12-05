@@ -60,8 +60,7 @@ class UnzerSDKLoaderTest extends TestCase
         $debugHandler = $this->getMockBuilder(DebugHandler::class)
             ->setConstructorArgs([$this->createMock(Logger::class)])
             ->getMock();
-        $session = $this->createConfiguredMock(Session::class, []);
 
-        return new UnzerSDKLoader($moduleSettings, $debugHandler, $session);
+        return new UnzerSDKLoader($moduleSettings, $debugHandler);
     }
 }

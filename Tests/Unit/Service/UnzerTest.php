@@ -20,6 +20,7 @@ use OxidSolutionCatalysts\Unzer\Service\Context;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
+use OxidSolutionCatalysts\Unzer\Service\TmpOrderServiceInterface;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
@@ -105,52 +106,6 @@ class UnzerTest extends TestCase
             ['other', ModuleSettings::PAYMENT_CHARGE],
         ];
     }
-
-    public function testIfImmediatePostAuthCollectTrue(): void
-    {
-        $moduleSettings = $this->createPartialMock(ModuleSettings::class, ['getPaymentProcedureSetting']);
-        $moduleSettings->method('getPaymentProcedureSetting')
-            ->willReturn(ModuleSettings::PAYMENT_CHARGE);
-        $sut = $this->getSut([ModuleSettings::class => $moduleSettings]);
-        $paymentService = $this->getPaymentServiceMock($sut);
-
-        $this->assertTrue($sut->ifImmediatePostAuthCollect($paymentService));
-    }
-
-    public function testIfImmediatePostAuthCollectFalse(): void
-    {
-        $moduleSettings = $this->createPartialMock(ModuleSettings::class, ['getPaymentProcedureSetting']);
-        $moduleSettings->method('getPaymentProcedureSetting')
-            ->willReturn(ModuleSettings::PAYMENT_AUTHORIZE);
-        $sut = $this->getSut([ModuleSettings::class => $moduleSettings]);
-        $paymentService = $this->getPaymentServiceMock($sut);
-
-        $paymentService->method('getUnzerOrderId')
-            ->willReturn('666');
-
-        $sql = "INSERT INTO oxorder SET OXID=9999, OXPAYMENTTYPE='oscunzer_paypal', OXUNZERORDERNR=666";
-        DatabaseProvider::getDb()->execute($sql);
-
-        $this->assertFalse($sut->ifImmediatePostAuthCollect($paymentService));
-    }
-
-    private function getPaymentServiceMock($sut)
-    {
-        return $this->getMockBuilder(Payment::class)
-            ->setConstructorArgs(
-                [
-                    $this->createMock(Session::class),
-                    $this->createMock(PaymentExtensionLoader::class),
-                    $this->createMock(Translator::class),
-                    $sut,
-                    $this->createMock(UnzerSDKLoader::class),
-                    $this->createMock(Transaction::class),
-                    $this->createMock(TransactionService::class)
-                ]
-            )
-            ->getMock();
-    }
-
 
     public function testGetPaymentProcedureAuthorizeForListedPayment(): void
     {

@@ -13,9 +13,9 @@ use UnzerSDK\Resources\PaymentTypes\Giropay as UnzerGiropay;
 
 class GiroPay extends UnzerPayment
 {
-    protected $paymentMethod = 'giropay';
+    protected string $paymentMethod = 'giropay';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

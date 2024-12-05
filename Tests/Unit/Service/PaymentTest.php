@@ -15,6 +15,9 @@ use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentSessionService;
+use OxidSolutionCatalysts\Unzer\Service\TmpOrderService;
+use OxidSolutionCatalysts\Unzer\Service\TmpOrderServiceInterface;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
@@ -179,7 +182,8 @@ class PaymentTest extends TestCase
                 $translatorMock,
                 $this->getUnzerServiceMock(),
                 $this->getUnzerSDKLoaderMock(),
-                $this->getTransactionServiceMock()
+                $this->getTransactionServiceMock(),
+                $this->createMock(TmpOrderServiceInterface::class)
             ])
             ->onlyMethods($methodsToMock)
             ->getMock();
@@ -212,7 +216,9 @@ class PaymentTest extends TestCase
             ->setConstructorArgs([
                 $this->getUnzerSDKLoaderMock(),
                 $this->getUnzerServiceMock(),
-                $this->getLoggerMock()
+                $this->getLoggerMock(),
+                $this->createMock(SavedPaymentSessionService::class),
+                $this->createMock(TmpOrderService::class)
             ])->onlyMethods(['getPaymentExtension', 'getPaymentExtensionByCustomerTypeAndCurrency'])
             ->getMock();
 
