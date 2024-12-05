@@ -25,7 +25,7 @@ class ApplePaySessionHandler
     private DebugHandler $logger;
 
     /**
-     * @param ModuleSettings $moduleSettings
+     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
      */
     public function __construct(ModuleSettings $moduleSettings, DebugHandler $logger)
     {
@@ -35,7 +35,7 @@ class ApplePaySessionHandler
     }
 
     /**
-     * @return void
+     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
      */
     private function initialize(): void
     {
@@ -64,10 +64,6 @@ class ApplePaySessionHandler
         }
     }
 
-    /**
-     * @param string $validationUrl
-     * @return array|null
-     */
     public function validateMerchant(string $validationUrl): ?array
     {
         // if we have no credentials we could not validate Merchant

@@ -272,30 +272,26 @@ class Order extends Order_parent
     }
 
     /**
-     * @param \UnzerSDK\Resources\Payment|null $unzerPayment
-     * @return bool
      * @throws UnzerApiException
      * @throws Exception
      */
-    public function initWriteTransactionToDB($unzerPayment = null): bool
+    public function initWriteTransactionToDB(\UnzerSDK\Resources\Payment|null $unzerPayment = null): void
     {
         /** @var string $oxpaymenttype */
         $oxpaymenttype = $this->getFieldData('oxpaymenttype');
-        if (strpos($oxpaymenttype, "oscunzer") !== false) {
+        if ($oxpaymenttype !== null && str_contains($oxpaymenttype, "oscunzer")) {
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
 
             $unzerPayment = $unzerPayment instanceof \UnzerSDK\Resources\Payment ?
                 $unzerPayment :
                 $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment(true);
 
-            return $transactionService->writeTransactionToDB(
+            $transactionService->writeTransactionToDB(
                 $this->getId(),
                 $this->getOrderUser()->getId() ?: '',
                 $unzerPayment
             );
         }
-
-        return false;
     }
 
     /**
@@ -304,9 +300,9 @@ class Order extends Order_parent
     public function getUnzerInvoiceNr()
     {
         /** @var int $number */
-        $number = $this->getFieldData('OXINVOICENR') !== 0 ?
-            $this->getFieldData('OXINVOICENR') :
-            $this->getFieldData('OXORDERNR');
+        $number = $this->getFieldData('oxinvoicenr') !== 0 ?
+            $this->getFieldData('oxinvoicenr') :
+            $this->getFieldData('oxordernr');
         return $number;
     }
 
@@ -334,22 +330,17 @@ class Order extends Order_parent
         return parent::delete($sOxId);
     }
 
-    /**
-     * @param string $fieldName
-     * @param string $value
-     * @param int $dataType
-     * @return false|void
-     */
-    public function setFieldData($fieldName, $value, $dataType = Field::T_TEXT)
+
+    public function setFieldData($fieldName, $value, $dataType = Field::T_TEXT): void
     {
-        return parent::setFieldData($fieldName, $value, $dataType);
+        parent::setFieldData($fieldName, $value, $dataType);
     }
 
     private function setTmpOrderStatus(string $unzerOrderId, string $status): void
     {
         $tmpOrder = oxNew(TmpOrder::class);
         $tmpData = $tmpOrder->getTmpOrderByUnzerId($unzerOrderId);
-        if ($tmpOrder->load($tmpData['OXID'])) {
+        if ($tmpOrder->load($tmpData['oxid'])) {
             $tmpOrder->assign(['status' => $status]);
             $tmpOrder->save();
         }

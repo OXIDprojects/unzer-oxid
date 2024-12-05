@@ -251,6 +251,13 @@ class ViewConfig extends ViewConfig_parent
         return $prePaymentBankAccountService->getHolder($unzerOrderNumber);
     }
 
+    public function getPrePaymentDescriptor(string $unzerOrderNumber): ?string
+    {
+        $prePaymentBankAccountService = $this->getPrePaymentBankAccountService();
+
+        return $prePaymentBankAccountService->getDescriptor($unzerOrderNumber);
+    }
+
     private function getPrePaymentBankAccountService(): PrePaymentBankAccountService
     {
         return $this->getServiceFromContainer(PrePaymentBankAccountService::class);

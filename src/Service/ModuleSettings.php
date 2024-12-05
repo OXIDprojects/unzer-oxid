@@ -42,24 +42,11 @@ class ModuleSettings
         'visa' => '1'
     ];
 
-    /** @var ModuleSettingBridgeInterface $moduleSettingBridge */
-    private $moduleSettingBridge;
+    private ModuleSettingBridgeInterface $moduleSettingBridge;
+    private ModuleConfigurationDaoBridgeInterface $moduleInfoBridge;
+    private Session $session;
+    private Config $config;
 
-    /** @var ModuleConfigurationDaoBridgeInterface  */
-    private $moduleInfoBridge;
-
-    /** @var Session $session */
-    private $session;
-
-    /** @var Config $config */
-    private $config;
-
-    /**
-     * @param ModuleSettingBridgeInterface $moduleSettingBridge
-     * @param ModuleConfigurationDaoBridgeInterface $moduleInfoBridge
-     * @param \OxidEsales\Eshop\Core\Session $session
-     * @param \OxidEsales\Eshop\Core\Config $config
-     */
     public function __construct(
         ModuleSettingBridgeInterface $moduleSettingBridge,
         ModuleConfigurationDaoBridgeInterface $moduleInfoBridge,
@@ -72,25 +59,16 @@ class ModuleSettings
         $this->config = $config;
     }
 
-    /**
-     * @return bool
-     */
     public function isDebugMode(): bool
     {
         return $this->getSettingValue('UnzerDebug') === true;
     }
 
-    /**
-     * @return bool
-     */
     public function isSandboxMode(): bool
     {
         return $this->getSystemMode() === self::SYSTEM_MODE_SANDBOX;
     }
 
-    /**
-     * @return string
-     */
     public function getSystemMode(): string
     {
         if ($this->getSettingValue('UnzerSystemMode')) {
@@ -99,33 +77,11 @@ class ModuleSettings
         return self::SYSTEM_MODE_SANDBOX;
     }
 
-    /**
-     * @param string $systemMode
-     * @return void
-     */
     public function setSystemMode(string $systemMode): void
     {
         $this->saveSetting('UnzerSystemMode', $systemMode);
     }
 
-//    /**
-//     * @return string
-//     */
-//    public function getShopPublicKey(): string
-//    {
-//        /** @var string $unzerPublicKey */
-//        $unzerPublicKey = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
-//        return $unzerPublicKey;
-//    }
-//    public function getShopPublicKeyPaylater(): string
-//    {
-//        /** @var string $unzerPublicKey */
-//        $unzerPublicKey = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
-//        return $unzerPublicKey;
-//    }
-    /**
-     * @return float
-     */
     public function getInstallmentRate(): float
     {
         /** @var float $unzerOption */
@@ -140,7 +96,6 @@ class ModuleSettings
         return $unzerPrivateKey;
     }
 
-
     public function getStandardPublicKey(): string
     {
         /** @var string $unzerPublicKey */
@@ -148,9 +103,6 @@ class ModuleSettings
         return $unzerPublicKey;
     }
 
-    /**
-     * @return bool
-     */
     public function useModuleJQueryInFrontend(): bool
     {
         /** @var bool $unzerJQuery */
@@ -158,10 +110,6 @@ class ModuleSettings
         return $unzerJQuery;
     }
 
-    /**
-     * @param string $paymentMethod
-     * @return string
-     */
     public function getPaymentProcedureSetting(string $paymentMethod): string
     {
         if (
@@ -173,25 +121,16 @@ class ModuleSettings
         return self::PAYMENT_CHARGE;
     }
 
-    /**
-     * @return string
-     */
     public function getModuleVersion(): string
     {
         return $this->moduleInfoBridge->get(Module::MODULE_ID)->getVersion();
     }
 
-    /**
-     * @return string
-     */
     public function getGitHubName(): string
     {
         return Module::GITHUB_NAME;
     }
 
-    /**
-     * @return bool
-     */
     public function isApplePayEligibility(): bool
     {
         return (
@@ -201,18 +140,12 @@ class ModuleSettings
         );
     }
 
-    /**
-     * @return mixed
-     */
-    public function getApplePayLabel()
+    public function getApplePayLabel(): mixed
     {
         return $this->getSettingValue('applepay_label') ?:
             $this->config->getActiveShop()->getFieldData('oxcompany') ?: 'default_label';
     }
 
-    /**
-     * @return array associative array including capability key and active status
-     */
     public function getApplePayMerchantCapabilities(): array
     {
         /** @var array $applepayMerchCaps */
@@ -223,9 +156,6 @@ class ModuleSettings
         );
     }
 
-    /**
-     * @return array array of active capability keys
-     */
     public function getActiveApplePayMerchantCapabilities(): array
     {
         return array_keys(array_filter(
@@ -234,9 +164,6 @@ class ModuleSettings
         ));
     }
 
-    /**
-     * @return array associative array including network key and active status
-     */
     public function getApplePayNetworks(): array
     {
         /** @var array $applepayNetworks */
@@ -247,9 +174,6 @@ class ModuleSettings
         );
     }
 
-    /**
-     * @return array array of active network keys
-     */
     public function getActiveApplePayNetworks(): array
     {
         return array_keys(array_filter(
@@ -258,9 +182,6 @@ class ModuleSettings
         ));
     }
 
-    /**
-     * @return string
-     */
     public function getApplePayMerchantIdentifier(): string
     {
         /** @var string $applepayMerchId */
@@ -269,10 +190,6 @@ class ModuleSettings
         return $applepayMerchId;
     }
 
-    /**
-     * @return string
-     * @throws FileException
-     */
     public function getApplePayMerchantCert(): string
     {
         $path = $this->getApplePayMerchantCertFilePath();
@@ -285,10 +202,6 @@ class ModuleSettings
         return '';
     }
 
-    /**
-     * @return string
-     * @throws FileException
-     */
     public function getApplePayMerchantCertKey(): string
     {
         $path = $this->getApplePayMerchantCertKeyFilePath();
@@ -302,16 +215,35 @@ class ModuleSettings
     }
 
     /**
-     * @param array $capabilities
-     * @return void
+     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
      */
+    public function getApplePayPaymentPrivateKey(): string
+    {
+        $path = $this->getApplePayPaymentPrivateKeyFilePath();
+        if (file_exists($path)) {
+            /** @var string $fileContest */
+            $fileContest = file_get_contents($path);
+            return $fileContest;
+        }
+
+        return '';
+    }
+
+    public function getApplePayPaymentCertFilePath(): string
+    {
+        return $this->getFilesPath()
+            . '/.applepay_payment_cert.'
+            . $this->getSystemMode()
+            . '.'
+            . $this->config->getShopId();
+    }
+
     public function saveApplePayMerchantCapabilities(array $capabilities): void
     {
         $this->saveSetting('applepay_merchant_capabilities', $capabilities);
     }
 
     /**
-     * @return string
      * @throws FileException
      */
     public function getApplePayMerchantCertFilePath(): string
@@ -323,10 +255,6 @@ class ModuleSettings
             . $this->config->getShopId();
     }
 
-    /**
-     * @return string
-     * @throws FileException
-     */
     public function getApplePayMerchantCertKeyFilePath(): string
     {
         return $this->getFilesPath()
@@ -337,9 +265,17 @@ class ModuleSettings
     }
 
     /**
-     * @return string
      * @throws FileException
      */
+    public function getApplePayPaymentPrivateKeyFilePath(): string
+    {
+        return $this->getFilesPath()
+            . '/.applepay_payment_key.'
+            . $this->getSystemMode()
+            . '.'
+            . $this->config->getShopId();
+    }
+
     public function getFilesPath(): string
     {
         $facts = new Facts();
@@ -356,27 +292,16 @@ class ModuleSettings
         return $path;
     }
 
-    /**
-     * @param string $paymentKeyId
-     * @return void
-     */
     public function saveApplePayPaymentKeyId(string $paymentKeyId): void
     {
         $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentKeyId', $paymentKeyId);
     }
 
-    /**
-     * @param string $certificateId
-     * @return void
-     */
     public function saveApplePayPaymentCertificateId(string $certificateId): void
     {
         $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentCertificateId', $certificateId);
     }
 
-    /**
-     * @return string
-     */
     public function getApplePayPaymentKeyId(): string
     {
         /** @var string $paymentKeyId */
@@ -384,9 +309,6 @@ class ModuleSettings
         return $paymentKeyId;
     }
 
-    /**
-     * @return string
-     */
     public function getApplePayPaymentCertificateId(): string
     {
         /** @var string $certificateId */
@@ -394,27 +316,28 @@ class ModuleSettings
         return $certificateId;
     }
 
-    /**
-     * @param array $networks
-     * @return void
-     */
+    public function getApplePayPaymentCert(): string
+    {
+        $path = $this->getApplePayPaymentCertFilePath();
+        if (file_exists($path)) {
+            /** @var string $fileContest */
+            $fileContest = file_get_contents($path);
+            return $fileContest;
+        }
+
+        return '';
+    }
+
     public function saveApplePayNetworks(array $networks): void
     {
         $this->saveSetting('applepay_networks', $networks);
     }
 
-    /**
-     * @param array $webhookConfig
-     * @return void
-     */
     public function saveWebhookConfiguration(array $webhookConfig): void
     {
         $this->moduleSettingBridge->save('webhookConfiguration', $webhookConfig, Module::MODULE_ID);
     }
 
-    /**
-     * @return array
-     */
     public function getWebhookConfiguration(): array
     {
         /** @var array $webhookConfig */
@@ -422,9 +345,6 @@ class ModuleSettings
         return $webhookConfig;
     }
 
-    /**
-     * @return array
-     */
     public function getPrivateKeysWithContext(): array
     {
         $privateKeys = [];
@@ -453,12 +373,7 @@ class ModuleSettings
         return $privateKeys;
     }
 
-    /**
-     * @param string $name
-     * @param bool|int|string|array $setting
-     * @return void
-     */
-    private function saveSetting(string $name, $setting): void
+    private function saveSetting(string $name, bool|int|string|array $setting): void
     {
         $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
     }
@@ -475,21 +390,13 @@ class ModuleSettings
     }
 
     /**
-     * Intended to be used as callback function
-     *
-     * @param bool|int|string $active
-     * @return bool
-     *
      * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
      */
-    private function isActiveSetting($active): bool
+    private function isActiveSetting(string $active): bool
     {
         return $active === '1';
     }
 
-    /**
-     * @return bool
-     */
     public function isStandardEligibility(): bool
     {
         return (
@@ -517,9 +424,6 @@ class ModuleSettings
         return !empty($userCompany);
     }
 
-    /**
-     * @return bool
-     */
     public function isInvoiceEligibility(): bool
     {
         return (
@@ -533,9 +437,6 @@ class ModuleSettings
         );
     }
 
-    /**
-     * @return bool
-     */
     public function isB2CInvoiceEligibility(): bool
     {
         return (
@@ -564,9 +465,6 @@ class ModuleSettings
             );
     }
 
-    /**
-     * @return bool
-     */
     public function isB2BInvoiceEligibility(): bool
     {
         return (

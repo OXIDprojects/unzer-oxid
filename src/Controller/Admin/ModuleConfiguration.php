@@ -12,37 +12,37 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ApiClient;
+use OxidSolutionCatalysts\Unzer\Service\ModuleConfiguration\AppleMerchantCertificate;
+use OxidSolutionCatalysts\Unzer\Service\ModuleConfiguration\ApplePaymentProcessingCertificate;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use Throwable;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 /**
- * Order class wrapper for Unzer module
- *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ModuleConfiguration extends ModuleConfiguration_parent
 {
     use ServiceContainer;
+    use Request;
 
-    /** @var Translator $translator */
-    protected $translator = null;
-    /** @var ModuleSettings $moduleSettings */
-    protected $moduleSettings = null;
-    /** @var UnzerWebhooks $unzerWebhooks */
-    protected $unzerWebhooks = null;
+    protected Translator $translator;
+    protected ModuleSettings $moduleSettings;
+    protected UnzerWebhooks $unzerWebhooks;
+
     protected string $_sModuleId; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
-    /**
-     * @inheritDoc
-     */
+    private string $errorPaymentMissing = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_MISSING';
+    private bool $isUpdate;
+
     public function __construct()
     {
         parent::__construct();
@@ -52,8 +52,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     }
 
     /**
-     * @inheritDoc
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function render()
@@ -67,6 +65,11 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $this->_aViewData['applePayNetworks'] = $this->moduleSettings->getApplePayNetworks();
                 $this->_aViewData['applePayMerchantCert'] = $this->moduleSettings->getApplePayMerchantCert();
                 $this->_aViewData['applePayMerchantCertKey'] = $this->moduleSettings->getApplePayMerchantCertKey();
+                $this->_aViewData['applePayPaymentProcessingCert'] = $this->moduleSettings->getApplePayPaymentCert();
+
+                $this->_aViewData['applePayPaymentProcessingCertKey'] =
+                    $this->moduleSettings->getApplePayPaymentPrivateKey();
+
                 $this->_aViewData['systemMode'] = $this->moduleSettings->getSystemMode();
             } catch (Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
@@ -112,26 +115,27 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     }
 
     /**
-     * @throws GuzzleException
-     * @throws JsonException
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function transferApplePayPaymentProcessingData(): void
     {
-        /** @var string $key */
-        $key = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCertKey');
-        /** @var string $cert */
-        $cert = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCert');
-        $errorMessage = !$key || !$cert ? 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT' : null;
+        $systemMode = $this->moduleSettings->getSystemMode();
+
+        $key = $this->getUnzerStringRequestParameter($systemMode . '-' . 'applePayPaymentProcessingCertKey');
+        $cert = $this->getUnzerStringRequestParameter($systemMode . '-' . 'applePayPaymentProcessingCert');
+        $errorMessage = $key && $cert ? null : $this->errorPaymentMissing;
+
+        $this->saveMerchantCert($systemMode);
+        $this->saveMerchantKey($systemMode);
+        $this->savePaymentCert($systemMode);
+        $this->savePaymentKey($systemMode);
 
         $apiClient = $this->getServiceFromContainer(ApiClient::class);
         $applePayKeyId = null;
         $applePayCertId = null;
 
-        // Upload Key
         if (is_null($errorMessage)) {
             try {
                 $response = $apiClient->uploadApplePayPaymentKey($key);
@@ -170,8 +174,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 if (!$response || $response->getStatusCode() !== 200) {
                     $errorMessage = 'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT';
                 } else {
-                    $this->moduleSettings->saveApplePayPaymentKeyId($applePayKeyId);
                     $this->moduleSettings->saveApplePayPaymentCertificateId($applePayCertId);
+                    $this->moduleSettings->saveApplePayPaymentKeyId($applePayKeyId);
                 }
             } catch (Throwable $loggerException) {
                 $errorMessage = 'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT';
@@ -192,118 +196,199 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
     public function getApplePayPaymentProcessingKeyExists(): bool
     {
-        $keyExists = false;
         $keyId = $this->moduleSettings->getApplePayPaymentKeyId();
         if ($this->moduleSettings->getApplePayMerchantCertKey() && $keyId) {
             try {
                 $response = $this->getServiceFromContainer(ApiClient::class)
-                    ->requestApplePayPaymentCert($keyId);
+                    ->requestApplePayPaymentKey($keyId);
                 if (!$response) {
-                    $this->addErrorTransmittingKey();
                     return false;
                 }
-                $keyExists = $response->getStatusCode() === 200;
-            } catch (GuzzleException $guzzleException) {
-                $this->addErrorTransmittingKey();
+                return $response->getStatusCode() === 200;
+            } catch (GuzzleException | JsonException $guzzleException) {
+                $this->addErrorToDisplay('OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY');
             }
         }
-        return $keyExists;
+        return false;
     }
 
-    /**
-     * @throws GuzzleException
-     */
     public function getApplePayPaymentProcessingCertExists(): bool
     {
-        $certExists = false;
         $certId = $this->moduleSettings->getApplePayPaymentCertificateId();
         if ($this->moduleSettings->getApplePayMerchantCert() && $certId) {
             try {
                 $response = $this->getServiceFromContainer(ApiClient::class)
                     ->requestApplePayPaymentCert($certId);
+
                 if (!$response) {
-                    $this->addErrorTransmittingCertificate();
+                    $this->addErrorToDisplay('OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT');
                     return false;
                 }
-                $certExists = $response->getStatusCode() === 200;
-            } catch (GuzzleException $guzzleException) {
-                $this->addErrorTransmittingCertificate();
+
+                return $response->getStatusCode() === 200;
+            } catch (GuzzleException | JsonException $guzzleException) {
+                $this->addErrorToDisplay('OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT');
+                return false;
             }
         }
-        return $certExists;
+        return false;
     }
 
     /**
-     * @return void
-     * @throws FileException
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
      */
-    public function saveConfVars()
+    public function saveConfVars(): void
     {
-        $request = Registry::getRequest();
-        if (
-            $request->getRequestEscapedParameter('oxid') &&
-            $request->getRequestEscapedParameter('oxid') === 'osc-unzer'
-        ) {
-            // the systemMode is very important, so we set it first ...
-            /** @var array $confselects */
-            $confselects = $request->getRequestEscapedParameter('confselects');
-            /** @var string $systemMode */
-            $systemMode = $confselects['UnzerSystemMode'];
-            $this->moduleSettings->setSystemMode($systemMode);
+        $moduleId = $this->getUnzerStringRequestEscapedParameter('oxid');
+        if ($moduleId === Module::MODULE_ID) {
+            $systemMode = $this->moduleSettings->getSystemMode();
 
-            $this->resetContentCache();
+            $applePayMC = $this->getUnzerArrayRequestParameter('applePayMC');
+            $this->moduleSettings->saveApplePayMerchantCapabilities($applePayMC);
+            $applePayNetworks = $this->getUnzerArrayRequestParameter('applePayNetworks');
 
-            $applePayMC = $request->getRequestEscapedParameter('applePayMC');
-            if (is_array($applePayMC)) {
-                $this->moduleSettings->saveApplePayMerchantCapabilities($applePayMC);
-            }
-            $applePayNetworks = $request->getRequestEscapedParameter('applePayNetworks');
-            if (is_array($applePayNetworks)) {
-                $this->moduleSettings->saveApplePayNetworks($applePayNetworks);
-            }
-            $certConfigKey = $this->moduleSettings->getSystemMode() . '-' . 'applePayMerchantCert';
-            $applePayMerchantCert = $request->getRequestEscapedParameter($certConfigKey);
-            file_put_contents(
-                $this->moduleSettings->getApplePayMerchantCertFilePath(),
-                $applePayMerchantCert
-            );
-            $keyConfigKey = $this->moduleSettings->getSystemMode() . '-' . 'applePayMerchantCertKey';
-            $applePayMerchCertKey = $request->getRequestEscapedParameter($keyConfigKey);
-            file_put_contents(
-                $this->moduleSettings->getApplePayMerchantCertKeyFilePath(),
-                $applePayMerchCertKey
-            );
-        }
+            $this->moduleSettings->saveApplePayNetworks($applePayNetworks);
 
-        parent::saveConfVars();
-        if ($request->getRequestEscapedParameter('oxid') === 'osc-unzer') {
+            $this->saveMerchantCert($systemMode);
+            $this->saveMerchantKey($systemMode);
+            $this->savePaymentCert($systemMode);
+            $this->savePaymentKey($systemMode);
+
             $this->moduleSettings->saveWebhookConfiguration([]);
             $this->registerWebhooks();
         }
+        parent::saveConfVars();
     }
 
-    private function addErrorTransmittingCertificate(): void
+    private function saveMerchantKey(string $systemMode): void
+    {
+        $errorIds = [
+            'onEmpty' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_KEY_EMPTY',
+            'onShort' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_KEY_TOO_SHORT'
+        ];
+
+        $newValue = $this->getUnzerStringRequestEscapedParameter(
+            $systemMode . '-' . 'applePayMerchantCertKey'
+        );
+
+        $oldValue = $this->moduleSettings->getApplePayMerchantCertKey();
+
+        $this->setIsUpdate($oldValue, $newValue);
+
+        $isValidMerchantKey = $this->validateCredentialsForSaving($newValue, $errorIds);
+
+        if ($isValidMerchantKey) {
+            $service = $this->getServiceFromContainer(AppleMerchantCertificate::class);
+            $service->saveCertificateKey($newValue);
+        }
+    }
+
+    private function saveMerchantCert(string $systemMode): void
+    {
+        $errorIds = [
+            'onEmpty' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_CERT_EMPTY',
+            'onShort' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_CERT_TOO_SHORT'
+        ];
+
+        $newValue = $this->getUnzerStringRequestEscapedParameter(
+            $systemMode . '-' . 'applePayMerchantCert'
+        );
+
+        $oldValue = $this->moduleSettings->getApplePayMerchantCert();
+
+        $this->setIsUpdate($oldValue, $newValue);
+
+        $isValidMerchantCert = $this->validateCredentialsForSaving($newValue, $errorIds);
+
+        if ($isValidMerchantCert) {
+            $service = $this->getServiceFromContainer(AppleMerchantCertificate::class);
+            $service->saveCertificate($newValue);
+        }
+    }
+
+    private function savePaymentKey(string $systemMode): void
+    {
+        $errorIds = [
+            'onEmpty' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY_EMPTY',
+            'onShort' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY_TOO_SHORT'
+        ];
+
+        $newValue = $this->getUnzerStringRequestEscapedParameter(
+            $systemMode . '-' . 'applePayPaymentProcessingCertKey'
+        );
+
+        $oldValue = $this->moduleSettings->getApplePayPaymentPrivateKey();
+
+        $this->setIsUpdate($oldValue, $newValue);
+        $isValidPaymentKey = $this->validateCredentialsForSaving($newValue, $errorIds);
+
+        if ($isValidPaymentKey) {
+            $service = $this->getServiceFromContainer(ApplePaymentProcessingCertificate::class);
+            $service->saveCertificateKey($newValue);
+        }
+    }
+
+    private function savePaymentCert(string $systemMode): void
+    {
+        $errorIds = [
+            'onEmpty' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT_EMPTY',
+            'onShort' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT_TOO_SHORT'
+        ];
+
+        $newValue = $this->getUnzerStringRequestEscapedParameter(
+            $systemMode . '-' . 'applePayPaymentProcessingCert'
+        );
+
+        $oldValue = $this->moduleSettings->getApplePayPaymentCert();
+
+        $this->setIsUpdate($oldValue, $newValue);
+
+        $isValidPaymentKey = $this->validateCredentialsForSaving($newValue, $errorIds);
+
+        if ($isValidPaymentKey) {
+            $service = $this->getServiceFromContainer(ApplePaymentProcessingCertificate::class);
+            $service->saveCertificate($newValue);
+        }
+    }
+
+    private function validateCredentialsForSaving(?string $string, array $errors): bool
+    {
+        if ($string === null || strlen($string) === 0) {
+            if ($this->getIsUpdate()) {
+                $this->addErrorToDisplay($errors['onEmpty']);
+            }
+            return true;
+        }
+
+        if (strlen($string) > 1 && strlen($string) < 32) {
+            $this->addErrorToDisplay($errors['onShort']);
+            return false;
+        }
+
+        return true;
+    }
+
+    private function addErrorToDisplay(string $translateId): void
     {
         Registry::getUtilsView()->addErrorToDisplay(
             oxNew(
                 UnzerException::class,
                 $this->translator->translate(
-                    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT'
+                    $translateId
                 )
             )
         );
     }
 
-    private function addErrorTransmittingKey(): void
+    private function setIsUpdate(?string $oldValue, ?string $newValue): bool
     {
-        Registry::getUtilsView()->addErrorToDisplay(
-            oxNew(
-                UnzerException::class,
-                $this->translator->translate(
-                    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY'
-                )
-            )
-        );
+        $this->isUpdate = $oldValue !== $newValue;
+        return $this->isUpdate;
+    }
+
+    private function getIsUpdate(): bool
+    {
+        return $this->isUpdate;
     }
 }

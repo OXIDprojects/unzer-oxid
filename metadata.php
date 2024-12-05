@@ -53,7 +53,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail'   => 'logo.svg',
-    'version'     => '2.2.0-rc.12',
+    'version'     => '2.2.0-rc.13',
     'author'      => 'OXID eSales AG',
     'url'         => 'https://www.oxid-esales.com',
     'email'       => 'info@oxid-esales.com',
@@ -222,13 +222,6 @@ $aModule = [
         [
             'group'       => 'unzerpaypal',
             'name'        => 'UnzerOption_oscunzer_paypal',
-            'type'        => 'select',
-            'value'       => '0',
-            'constraints' => '0|1'
-        ],
-        [
-            'group'       => 'unzerapplepay',
-            'name'        => 'UnzerOption_oscunzer_applepay',
             'type'        => 'select',
             'value'       => '0',
             'constraints' => '0|1'

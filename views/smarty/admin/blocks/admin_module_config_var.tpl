@@ -38,9 +38,7 @@
         [{/if}]
     </dl>
     [{elseif $var_group eq "unzerapplepay"}]
-        [{if $module_var eq "UnzerOption_oscunzer_applepay"}]
-            [{$smarty.block.parent}]
-        [{elseif $module_var eq "applepay_merchant_capabilities" or $module_var eq "applepay_networks"}]
+        [{if $module_var eq "applepay_merchant_capabilities" or $module_var eq "applepay_networks"}]
             <dl>
                 <dd>
                     [{oxmultilang ident="SHOP_MODULE_`$module_var`"}]

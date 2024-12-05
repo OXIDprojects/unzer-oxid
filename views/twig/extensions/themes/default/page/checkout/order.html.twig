@@ -195,13 +195,6 @@
                                                     <input type="hidden" name="oxdownloadableproductsagreement"
                                                            value="0">
                                                     <input type="hidden" name="oxserviceproductsagreement" value="0">
-
-                                                    {%  block checkout_order_btn_submit_bottom %}
-                                                        {% set payment = oView.getPayment() %}
-                                                        {% if payment.getId() is same as('oscunzer_applepay') %}
-                                                            {% include "@osc-unzer/frontend/tpl/order/applepay_button.html.twig" %}
-                                                        {% endif %}
-                                                    {% endblock %}
                                                 </form>
                                             {% endblock %}
                                         {% endif %}
@@ -230,11 +223,17 @@
                                     </form>
                                 </div>
                             {% endif %}
-
-                            <button type="submit" class="btn btn-highlight btn-lg w-100"
-                                    onclick="executeUnzerPayment(event)" id="submitOrder">
-                                {{ translate({ ident: "SUBMIT_ORDER" }) }}
-                            </button>
+                            {%  block checkout_order_btn_submit_bottom %}
+                                {% set payment = oView.getPayment() %}
+                                {% if payment.getId() is same as('oscunzer_applepay') %}
+                                    {% include "@osc-unzer/frontend/tpl/order/applepay_button.html.twig" %}
+                                {% else %}
+                                    <button type="submit" class="btn btn-highlight btn-lg w-100"
+                                            onclick="executeUnzerPayment(event)" id="submitOrder">
+                                        {{ translate({ ident: "SUBMIT_ORDER" }) }}
+                                    </button>
+                                {% endif %}
+                            {% endblock %}
                         </div>
                     </div>
                 </div>

@@ -13,6 +13,7 @@ use JsonException;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\ApplePaySessionHandler;
+use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
@@ -20,9 +21,6 @@ class ApplePayCallbackController extends FrontendController
 {
     use ServiceContainer;
 
-    /**
-     * @throws JsonException
-     */
     public function validateMerchant(): void
     {
         /** @var string $merchValidUrlRaw */
@@ -30,9 +28,11 @@ class ApplePayCallbackController extends FrontendController
         $merchValidUrl = urldecode($merchValidUrlRaw);
 
         $responseHandler = $this->getServiceFromContainer(ResponseHandler::class);
+
         $validationResponse = $this
             ->getServiceFromContainer(ApplePaySessionHandler::class)
             ->validateMerchant($merchValidUrl);
+
         if (is_array($validationResponse)) {
             $responseHandler
                 ->response()

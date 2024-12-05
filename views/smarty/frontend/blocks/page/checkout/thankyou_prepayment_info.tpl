@@ -11,6 +11,9 @@
     [{if $oViewConf->getPrePaymentHolder($orderNumber)}]
         [{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BANK_HOLDER"}]: [{$oViewConf->getPrePaymentHolder($orderNumber)}]<br/>
     [{/if}]
+    [{if $oView->getUnzerPrePaymentDescriptor($orderNumber)}]
+        [{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_DESCRIPTOR"}]: [{$oViewConf->getUnzerPrePaymentDescriptor($orderNumber)}]<br/>
+        [{/if}]
     [{if $oViewConf->getPrePaymentIban($orderNumber)}]
         <br/>
     [{/if}]

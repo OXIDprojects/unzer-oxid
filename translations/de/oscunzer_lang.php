@@ -131,10 +131,9 @@ $aLang = [
     'OSCUNZER_REMOVE_PAYMENT' => 'Gespeicherte Zahlungsart löschen?',
     'OSCUNZER_NEW_CARD' => 'Neue Kreditkarte',
     'OSCUNZER_INVALID_PAYMENT_METHOD' => 'Ungültige Zahlart',
-    'OSCUNZER_NEW_CARD' => 'Neue Kreditkarte',
-    'OSCUNZER_INVALID_PAYMENT_METHOD' => 'Ungültige Zahlart',
     'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_HEADLINE' => 'Bankkonto Details',
     'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_IBAN' => 'IBAN',
     'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BIC' => 'BIC',
     'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BANK_HOLDER' => 'Kontoinhaber',
+    'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BANK_DESCRIPTOR' => 'Verwendungszweck',
 ];

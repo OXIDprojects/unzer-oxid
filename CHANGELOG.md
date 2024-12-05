@@ -35,6 +35,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - fix show multiple vouchers separately
 - fix: only OK, NOT_FINISHED or CANCEL in oxorder->oxtranstatus allowed
 - fix showing correct amount when cancelling in admin
+- Order of credit card data input fields optimized
+- Add Descriptor for PrePayment on ThankYou-Page
+- remove Option "Capture Later"-Option for ApplePay
 
 ## [2.1.4] - 2023-11-23
 

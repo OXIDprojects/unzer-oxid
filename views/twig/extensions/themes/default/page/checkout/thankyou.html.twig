@@ -13,6 +13,9 @@
     {% if oViewConf.getPrePaymentHolder(orderNumber) %}
         {{ translate({ ident: 'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BANK_HOLDER'  }) }}: {{ oViewConf.getPrePaymentHolder(orderNumber) }}<br/>
     {% endif %}
+    {% if oViewConf.getPrePaymentDescriptor(orderNumber) %}
+        {{ translate({ ident: 'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BANK_DESCRIPTOR'  }) }}: {{ oViewConf.getPrePaymentDescriptor(orderNumber) }}<br/>
+    {% endif %}
     {% if oViewConf.getPrePaymentIban(orderNumber) %}
         <br/>
     {% endif %}
