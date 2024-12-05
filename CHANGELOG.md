@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Order of credit card data input fields optimized
 - Add Descriptor for PrePayment on ThankYou-Page
 - remove Option "Capture Later"-Option for ApplePay
+- Save ApplePay-Certificates for Test- and Live-Mode. Fix an possible Maintenance when something was wrong before
+- Fixed a problem when multiple modules were in use. If Unzer was not last in some extended classes, this could lead to a maintenance.
 
 ## [1.2.0] - 2024-09-26
 
