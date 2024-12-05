@@ -39,9 +39,7 @@
                 {% endif %}
             </dl>
         {% elseif var_group == "unzerapplepay" %}
-            {% if module_var == "UnzerOption_oscunzer_applepay" %}
-                &nbsp;
-            {% elseif module_var == "applepay_merchant_capabilities" or module_var == "applepay_networks" %}
+            {% if module_var == "applepay_merchant_capabilities" or module_var == "applepay_networks" %}
                 <dl>
                     <dd>
                         {{ translate({ ident: "SHOP_MODULE_"|cat(module_var) }) }}
