@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### FIXED
 - [0007730](https://bugs.oxid-esales.com/view.php?id=7730): even if the credit card payment was cancelled (when entering the secure code), an order confirmation is sent
+- Order of credit card data input fields optimized
+- Add Descriptor for PrePayment on ThankYou-Page
+- remove Option "Capture Later"-Option for ApplePay
 
 ## [1.2.0] - 2024-09-26
 
