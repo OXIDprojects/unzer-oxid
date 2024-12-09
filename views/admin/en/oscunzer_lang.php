@@ -81,6 +81,9 @@ $aLang = [
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_CERT_TOO_SHORT' => 'ApplePay: Merchant certificate is too short',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_CERT_EMPTY' => 'ApplePay: Merchant certificate is empty',
 
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_ID_TOO_SHORT' => 'ApplePay: Merchant identifier is too short',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_ID_EMPTY' => 'ApplePay: Merchant identifier is empty',
+
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY_TOO_SHORT' => 'ApplePay: Payment key is too short',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY_EMPTY' => 'ApplePay: Payment key is empty',
 

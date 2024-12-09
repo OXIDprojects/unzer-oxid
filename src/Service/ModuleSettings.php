@@ -131,9 +131,7 @@ class ModuleSettings
         return $unzerPublicKey;
     }
 
-    /**
-     * @return bool
-     */
+
     public function useModuleJQueryInFrontend(): bool
     {
         /** @var bool $unzerJQuery */
@@ -141,10 +139,6 @@ class ModuleSettings
         return $unzerJQuery;
     }
 
-    /**
-     * @param string $paymentMethod
-     * @return string
-     */
     public function getPaymentProcedureSetting(string $paymentMethod): string
     {
         if (
@@ -157,25 +151,19 @@ class ModuleSettings
         return self::PAYMENT_CHARGE;
     }
 
-    /**
-     * @return string
-     */
+
     public function getModuleVersion(): string
     {
         return $this->moduleInfoBridge->get(Module::MODULE_ID)->getVersion();
     }
 
-    /**
-     * @return string
-     */
+
     public function getGitHubName(): string
     {
         return Module::GITHUB_NAME;
     }
 
-    /**
-     * @return bool
-     */
+
     public function isApplePayEligibility(): bool
     {
         return (
@@ -185,18 +173,13 @@ class ModuleSettings
         );
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getApplePayLabel()
     {
         return $this->getSettingValue('applepay_label') ?:
             $this->config->getActiveShop()->getFieldData('oxcompany') ?: 'default_label';
     }
 
-    /**
-     * @return array associative array including capability key and active status
-     */
     public function getApplePayMerchantCapabilities(): array
     {
         /** @var array $applepayMerchCaps */
@@ -207,9 +190,7 @@ class ModuleSettings
         );
     }
 
-    /**
-     * @return array array of active capability keys
-     */
+
     public function getActiveApplePayMerchantCapabilities(): array
     {
         return array_keys(array_filter(
@@ -218,9 +199,7 @@ class ModuleSettings
         ));
     }
 
-    /**
-     * @return array associative array including network key and active status
-     */
+
     public function getApplePayNetworks(): array
     {
         /** @var array $applepayNetworks */
@@ -231,9 +210,7 @@ class ModuleSettings
         );
     }
 
-    /**
-     * @return array array of active network keys
-     */
+
     public function getActiveApplePayNetworks(): array
     {
         return array_keys(array_filter(
@@ -242,9 +219,7 @@ class ModuleSettings
         ));
     }
 
-    /**
-     * @return string
-     */
+
     public function getApplePayMerchantIdentifier(): string
     {
         /** @var string $applepayMerchId */
@@ -253,9 +228,13 @@ class ModuleSettings
         return $applepayMerchId;
     }
 
-    /**
-     * @return string
-     */
+
+    public function setApplePayMerchantIdentifier(string $applepayMerchId): void
+    {
+        $this->saveSetting($this->getSystemMode() . '-applepay_merchant_identifier', $applepayMerchId);
+    }
+
+
     public function getApplePayMerchantCert(): string
     {
         try {
@@ -273,10 +252,8 @@ class ModuleSettings
         return '';
     }
 
-    /**
-     * @return string
-     * @throws FileException
-     */
+
+
     public function getApplePayPaymentCert(): string
     {
         try {
@@ -293,9 +270,8 @@ class ModuleSettings
         return '';
     }
 
-    /**
-     * @return string
-     */
+
+
     public function getApplePayPaymentPrivateKey(): string
     {
         try {
@@ -312,9 +288,7 @@ class ModuleSettings
         return '';
     }
 
-    /**
-     * @return string
-     */
+
     public function getApplePayMerchantCertKey(): string
     {
         try {
@@ -331,17 +305,13 @@ class ModuleSettings
         return '';
     }
 
-    /**
-     * @param array $capabilities
-     * @return void
-     */
+
     public function saveApplePayMerchantCapabilities(array $capabilities): void
     {
         $this->saveSetting('applepay_merchant_capabilities', $capabilities);
     }
 
     /**
-     * @return string
      * @throws FileException
      */
     public function getApplePayMerchantCertFilePath(): string
@@ -354,7 +324,6 @@ class ModuleSettings
     }
 
     /**
-     * @return string
      * @throws FileException
      */
     public function getApplePayMerchantCertKeyFilePath(): string
@@ -367,7 +336,6 @@ class ModuleSettings
     }
 
     /**
-     * @return string
      * @throws FileException
      */
     public function getApplePayPaymentCertFilePath(): string
@@ -380,7 +348,6 @@ class ModuleSettings
     }
 
     /**
-     * @return string
      * @throws FileException
      */
     public function getApplePayPaymentPrivateKeyFilePath(): string
@@ -393,7 +360,6 @@ class ModuleSettings
     }
 
     /**
-     * @return string
      * @throws FileException|Exception
      */
     public function getFilesPath(): string
@@ -412,27 +378,18 @@ class ModuleSettings
         return $path;
     }
 
-    /**
-     * @param string $paymentKeyId
-     * @return void
-     */
     public function saveApplePayPaymentKeyId(string $paymentKeyId): void
     {
         $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentKeyId', $paymentKeyId);
     }
 
-    /**
-     * @param string $certificateId
-     * @return void
-     */
+
     public function saveApplePayPaymentCertificateId(string $certificateId): void
     {
         $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentCertificateId', $certificateId);
     }
 
-    /**
-     * @return string
-     */
+
     public function getApplePayPaymentKeyId(): string
     {
         /** @var string $paymentKeyId */
@@ -440,9 +397,7 @@ class ModuleSettings
         return $paymentKeyId;
     }
 
-    /**
-     * @return string
-     */
+
     public function getApplePayPaymentCertificateId(): string
     {
         /** @var string $certificateId */
@@ -450,27 +405,19 @@ class ModuleSettings
         return $certificateId;
     }
 
-    /**
-     * @param array $networks
-     * @return void
-     */
+
     public function saveApplePayNetworks(array $networks): void
     {
         $this->saveSetting('applepay_networks', $networks);
     }
 
-    /**
-     * @param array $webhookConfig
-     * @return void
-     */
+
     public function saveWebhookConfiguration(array $webhookConfig): void
     {
         $this->saveSetting('webhookConfiguration', $webhookConfig);
     }
 
-    /**
-     * @return array
-     */
+
     public function getWebhookConfiguration(): array
     {
         /** @var array $webhookConfig */
@@ -478,9 +425,7 @@ class ModuleSettings
         return $webhookConfig;
     }
 
-    /**
-     * @return array
-     */
+
     public function getPrivateKeysWithContext(): array
     {
         $privateKeys = [];
@@ -509,19 +454,13 @@ class ModuleSettings
         return $privateKeys;
     }
 
-    /**
-     * @param string $name
-     * @param bool|int|string|array $setting
-     * @return void
-     */
+
     private function saveSetting(string $name, $setting): void
     {
         $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
     }
 
-    /**
-     * @return mixed
-     */
+
     private function getSettingValue(string $key)
     {
         return $this->moduleSettingBridge->get($key, Module::MODULE_ID);
@@ -529,10 +468,6 @@ class ModuleSettings
 
     /**
      * Intended to be used as callback function
-     *
-     * @param bool|int|string $active
-     * @return bool
-     *
      * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
      */
     private function isActiveSetting($active): bool
@@ -540,9 +475,6 @@ class ModuleSettings
         return $active === '1';
     }
 
-    /**
-     * @return bool
-     */
     public function isStandardEligibility(): bool
     {
         return (
@@ -552,9 +484,6 @@ class ModuleSettings
         );
     }
 
-    /**
-     * @return bool
-     */
     public function isInvoiceEligibility(): bool
     {
         return (
@@ -576,9 +505,6 @@ class ModuleSettings
         return !empty($userCompany);
     }
 
-    /**
-     * @return bool
-     */
     public function isInstallmentEligibility(): bool
     {
         return (
@@ -602,9 +528,7 @@ class ModuleSettings
                 !empty($this->getInstallmentB2CEURPrivateKey())
             );
     }
-    /**
-     * @return bool
-     */
+
     public function isB2CInvoiceEligibility(): bool
     {
         return (
@@ -619,9 +543,6 @@ class ModuleSettings
         );
     }
 
-    /**
-     * @return bool
-     */
     public function isB2BInvoiceEligibility(): bool
     {
         return (

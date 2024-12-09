@@ -132,6 +132,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         $this->saveMerchantCert($systemMode);
         $this->saveMerchantKey($systemMode);
+        $this->saveMerchantIdentifier($systemMode);
         $this->savePaymentCert($systemMode);
         $this->savePaymentKey($systemMode);
 
@@ -264,6 +265,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
             $this->saveMerchantCert($systemMode);
             $this->saveMerchantKey($systemMode);
+            $this->saveMerchantIdentifier($systemMode);
             $this->savePaymentCert($systemMode);
             $this->savePaymentKey($systemMode);
 
@@ -296,6 +298,28 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         if ($isValidMerchantKey) {
             $service = $this->getServiceFromContainer(AppleMerchantCertificate::class);
             $service->saveCertificateKey($newValue);
+        }
+    }
+
+    private function saveMerchantIdentifier(string $systemMode): void
+    {
+        $errorIds = [
+            'onEmpty' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_ID_EMPTY',
+            'onShort' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_ID_TOO_SHORT'
+        ];
+
+        $newValue = $this->getUnzerStringRequestEscapedParameter(
+            $systemMode . '-' . 'applepay_merchant_identifier'
+        );
+
+        $oldValue = $this->moduleSettings->getApplePayMerchantIdentifier();
+
+        $this->setIsUpdate($oldValue, $newValue);
+
+        $isValid = $this->validateCredentialsForSaving($newValue, $errorIds);
+
+        if ($isValid) {
+            $this->moduleSettings->setApplePayMerchantIdentifier($newValue);
         }
     }
 
