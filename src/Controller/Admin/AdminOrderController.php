@@ -12,7 +12,6 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidEsales\Eshop\Application\Model\Payment;
-use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\Payment as UnzerPaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
@@ -194,7 +193,7 @@ class AdminOrderController extends AdminDetailsController
                 $editObject->getFieldData('oxpaid') == '0000-00-00 00:00:00' &&
                 $fCharged == $unzerPayment->getAmount()->getTotal()
             ) {
-                /** @var UnzerOrder $editObject */
+                /** @var \OxidSolutionCatalysts\Unzer\Model\Order $editObject */
                 $editObject->markUnzerOrderAsPaid();
                 $this->forceReloadListFrame();
             }

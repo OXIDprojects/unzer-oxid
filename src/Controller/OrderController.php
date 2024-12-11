@@ -495,7 +495,12 @@ class OrderController extends OrderController_parent
 
             $isOrderAlreadyCancelled = Registry::getSession()->getVariable('orderCancellationProcessed');
             if (!$isOrderAlreadyCancelled) {
-                $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+                $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect(
+                    $oBasket,
+                    $oUser,
+                    ['finalizeCancellation' => true]
+                );
+
                 $oUser->onOrderExecute($oBasket, $iSuccess);
             }
             Registry::getSession()->deleteVariable('orderCancellationProcessed');
@@ -506,7 +511,6 @@ class OrderController extends OrderController_parent
 
             Registry::getSession()->setVariable('sess_challenge', $this->getUtilsObjectInstance()->generateUID());
             Registry::getSession()->setBasket($oBasket);
-            Registry::getSession()->deleteVariable('orderCancellationProcessed');
             $this->redirectUserToCheckout($unzerService, $oOrder);
         }
     }

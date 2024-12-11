@@ -112,11 +112,12 @@ class FlexibleSerializer
     /**
      * Restore unserializable data, including objects of allowed classes.
      *
-     * @param mixed $data The data to be restored.
+     * @param mixed $data           The data to be restored.
      * @param array $allowedClasses An array of fully qualified class names that are allowed to be restored.
      * @return mixed The restored data.
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ElseExpression)
+     * @throws \ReflectionException
      */
     private function restoreUnserializable($data, array $allowedClasses)
     {
@@ -127,7 +128,7 @@ class FlexibleSerializer
         }
 
         if (is_object($data) && isset($data->__class)) {
-            $className = $data->__class;
+            $className = get_parent_class($data->__class);
             if ($this->isAllowedClass($className, $allowedClasses)) {
                 $reflection = new ReflectionClass($className);
                 $restored = $reflection->newInstanceWithoutConstructor();

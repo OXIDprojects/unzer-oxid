@@ -41,7 +41,8 @@ class Order extends Order_parent
      */
     public function finalizeUnzerOrderAfterRedirect(
         Basket $oBasket,
-        User $oUser
+        User $oUser,
+        array $params = []
     ) {
         $orderId = Registry::getSession()->getVariable('sess_challenge');
         $orderId = is_string($orderId) ? $orderId : '';
@@ -97,10 +98,18 @@ class Order extends Order_parent
             } else {
                 if ($unzerPaymentStatus !== PaymentService::STATUS_NOT_FINISHED) {
                     Registry::getSession()->setVariable('orderCancellationProcessed', true);
-                    $iRet = 1; //TODO: not sure if this is correct - this is hardcoded for the Paypal cancellaction
                 }
-                $this->_setOrderStatus($unzerPaymentStatus); //ERROR if paypal
+
+                $this->_setOrderStatus($unzerPaymentStatus);
                 $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
+
+                if (!isset($params['finalizeCancellation']))
+                {
+                    //  then we consider this is a payment with only auth mode and the order is completed
+                    $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);
+                }
+
+                $iRet = 1;
             }
         }
 

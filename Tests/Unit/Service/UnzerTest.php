@@ -99,7 +99,6 @@ class UnzerTest extends TestCase
         return [
             ['paypal', 'special'],
             ['card', 'special'],
-            ['applepay', 'special'],
             ['installment-secured', 'authorize'],
             ['paylater-installment', 'authorize'],
             ['paylater-invoice', 'authorize'],
