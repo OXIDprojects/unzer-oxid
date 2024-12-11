@@ -7,10 +7,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
 use ReflectionClass;
-use ReflectionException;
 use stdClass;
 
 class FlexibleSerializer
@@ -129,6 +127,9 @@ class FlexibleSerializer
 
         if (is_object($data) && isset($data->__class)) {
             $className = get_parent_class($data->__class);
+            if (!$className) {
+                $className = $data->__class;
+            }
             if ($this->isAllowedClass($className, $allowedClasses)) {
                 $reflection = new ReflectionClass($className);
                 $restored = $reflection->newInstanceWithoutConstructor();

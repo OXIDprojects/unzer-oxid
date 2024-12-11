@@ -173,7 +173,9 @@ class ModuleSettings
         );
     }
 
-
+    /**
+     * @return mixed|string
+     */
     public function getApplePayLabel()
     {
         return $this->getSettingValue('applepay_label') ?:
@@ -454,13 +456,20 @@ class ModuleSettings
         return $privateKeys;
     }
 
-
+    /**
+     * @param string $name
+     * @param bool|int|string|array $setting
+     * @return void
+     */
     private function saveSetting(string $name, $setting): void
     {
         $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
     }
 
-
+    /**
+     * @param string $key
+     * @return mixed
+     */
     private function getSettingValue(string $key)
     {
         return $this->moduleSettingBridge->get($key, Module::MODULE_ID);
@@ -470,7 +479,7 @@ class ModuleSettings
      * Intended to be used as callback function
      * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
      */
-    private function isActiveSetting($active): bool
+    private function isActiveSetting(string $active): bool
     {
         return $active === '1';
     }

@@ -34,10 +34,11 @@ class Order extends Order_parent
     /**
      * @param Basket $oBasket
      * @param User $oUser
+     * @param array $params
      * @return int|bool
-     * @throws Exception
-     *
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function finalizeUnzerOrderAfterRedirect(
         Basket $oBasket,
@@ -103,8 +104,7 @@ class Order extends Order_parent
                 $this->_setOrderStatus($unzerPaymentStatus);
                 $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
 
-                if (!isset($params['finalizeCancellation']))
-                {
+                if (!isset($params['finalizeCancellation'])) {
                     //  then we consider this is a payment with only auth mode and the order is completed
                     $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);
                 }
