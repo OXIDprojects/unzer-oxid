@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Save ApplePay-Certificates for Test- and Live-Mode. Fix an possible Maintenance when something was wrong before
 - Fixed a problem when multiple modules were in use. If Unzer was not last in some extended classes, this could lead to a maintenance.
 - [0007739](https://bugs.oxid-esales.com/view.php?id=7739): Fix that order with payment method Unzer bancontact is not created after successful payment
+- Fix email notification sending for payments with auth only mode
 
 ## [1.2.0] - 2024-09-26
 
