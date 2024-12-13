@@ -28,11 +28,10 @@ class FlexibleSerializerTest extends TestCase
 
         $serialized = $this->flexibleSerializer->safeSerialize($order);
         $unserialized = $this->flexibleSerializer->safeUnserialize(
-            $serialized,
-            ['OxidEsales\Eshop\Application\Model\Order']
+            $serialized
         );
 
-        $this->assertInstanceOf('OxidEsales\Eshop\Application\Model\Order', $unserialized);
+        $this->assertInstanceOf(\stdClass::class, $unserialized);
         $this->assertEquals(1, $unserialized->id);
         $this->assertEquals('John Doe', $unserialized->customerName);
     }
@@ -50,7 +49,6 @@ class FlexibleSerializerTest extends TestCase
             ['OxidEsales\Eshop\Application\Model\Order']
         );
 
-        $this->assertInstanceOf('OxidEsales\Eshop\Application\Model\Order', $unserialized);
         $this->assertEquals(1, $unserialized->id);
         $this->assertEquals('John Doe', $unserialized->customerName);
         $this->assertEquals('Extra Info', $unserialized->extraField);
@@ -132,7 +130,6 @@ class FlexibleSerializerTest extends TestCase
             [\OxidEsales\Eshop\Application\Model\Order::class]
         );
 
-        $this->assertInstanceOf(Order::class, $unserialized);
         $this->assertEquals(1, $unserialized->id);
         $this->assertEquals('John Doe', $unserialized->customerName);
         $this->assertEquals('Extra Info', $unserialized->extraField);

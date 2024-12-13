@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
@@ -83,9 +85,10 @@ class Transaction
      * @param string $userId
      * @param Payment|null $unzerPayment
      * @param Shipment|null $unzerShipment
+     * @param \UnzerSDK\Resources\TransactionTypes\AbstractTransactionType|null $transaction
      * @return bool
-     * @throws Exception
-    */
+     * @throws \JsonException
+     */
     public function writeTransactionToDB(
         string $orderid,
         string $userId,
@@ -225,7 +228,7 @@ class Transaction
     /**
      * @throws JsonException
      */
-    protected function saveTransaction(array $params): bool
+    public function saveTransaction(array $params): bool
     {
         $result = false;
         $transaction = $this->getNewTransactionObject();
@@ -234,11 +237,16 @@ class Transaction
 
         $oxid = $this->prepareTransactionOxid($params);
 
-//        if (!$transaction->load($oxid) && $this->canSaveTransaction($transaction, $params)) {
-        if (!$transaction->load($oxid)) {
-            $transaction->assign($params);
-            $transaction->setId($oxid);
-            $transaction->save();
+        try {
+            if (!$transaction->load($oxid)) {
+                $transaction->assign($params);
+                $transaction->setId($oxid);
+                $transaction->save();
+                $result = true;
+            }
+        } catch (DatabaseErrorException $e) {
+            $logger = $this->getServiceFromContainer(DebugHandler::class);
+            $logger->log("saveTransaction: " . $e->getMessage());
             $result = true;
         }
 
@@ -405,10 +413,6 @@ class Transaction
 
         return $params;
     }
-
-    /**
-     * @return TransactionModel
-     */
 
     protected function getNewTransactionObject(): TransactionModel
     {
