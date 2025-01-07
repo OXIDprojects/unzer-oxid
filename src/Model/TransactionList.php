@@ -19,9 +19,6 @@ class TransactionList extends ListModel
     */
     protected $_sObjectsInListName = 'OxidSolutionCatalysts\Unzer\Model\Transaction'; // phpcs:ignore
 
-    /**
-     * @return void
-     */
     public function getTransactionList(string $orderId): void
     {
         $oListObject = $this->getBaseObject();

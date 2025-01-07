@@ -19,6 +19,7 @@ use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Payment as UnzerPaymentResource;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
@@ -76,11 +77,9 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData['oOrder'] = $oOrder;
             /** @var string $sPaymentId */
             $sPaymentId = $oOrder->getFieldData('oxpaymenttype');
-
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             $orderId = $this->getEditObjectId();
-            $paymentId = $transactionService->getPaymentIdByOrderId($orderId, true); //somthesing like s-chg-XXXX
-            $this->sTypeId = $paymentId;
+            $this->sTypeId = $transactionService->getPaymentIdByOrderId($orderId, true); //i.e. s-chg-XXXX
             $this->_aViewData['sTypeId'] = $this->sTypeId;
             if ($this->sTypeId) {
                 $this->getUnzerViewData($sPaymentId, $this->sTypeId);
@@ -189,6 +188,11 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData['aCancellations'] = $this->getCancellationsViewData((string)$unzerPayment->getTraceId());
             $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
 
+            $this->_aViewData['oUnzerTransactions'] = $this->filterTransactionList(
+                $unzerPayment,
+                $this->_aViewData['oUnzerTransactions']
+            );
+
             if (
                 $editObject->getFieldData('oxpaid') == '0000-00-00 00:00:00' &&
                 $fCharged == $unzerPayment->getAmount()->getTotal()
@@ -261,6 +265,7 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData["holderData"] = $holderData;
         }
     }
+
     protected function addAuthorizationViewData(Authorization $authorization): void
     {
         $date = '';
@@ -300,9 +305,7 @@ class AdminOrderController extends AdminDetailsController
         return $transactionService->getCustomerTypeAndCurrencyByOrderId($this->getEditObjectId());
     }
 
-    /**
-     * @return void
-     */
+
     protected function forceReloadListFrame(): void
     {
         // we need to set the "edit object id", which will automatically be recognized to reload the list (admin area)
@@ -311,9 +314,7 @@ class AdminOrderController extends AdminDetailsController
         $this->setEditObjectId($oOrder->getId());
     }
 
-    /**
-     * @return void
-     */
+
     public function sendShipmentNotification(): void
     {
         $unzerid = $this->getUnzerStringRequestParameter('unzerid');
@@ -334,9 +335,7 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    /**
-     * @return void
-     */
+
     public function doUnzerCollect(): void
     {
         $this->forceReloadListFrame();
@@ -355,10 +354,8 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    /**
-     * @return void
-     */
-    public function doUnzerCancel()
+
+    public function doUnzerCancel(): void
     {
         $this->forceReloadListFrame();
         $unzerid = $this->getUnzerStringRequestParameter('unzerid');
@@ -397,10 +394,8 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    /**
-     * @return void
-     */
-    public function doUnzerAuthorizationCancel()
+
+    public function doUnzerAuthorizationCancel(): void
     {
         $this->forceReloadListFrame();
         $unzerid = $this->getUnzerStringRequestParameter('unzerid');
@@ -427,11 +422,7 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    /**
-     * Method checks is order was made with unzer payment
-     *
-     * @return bool
-     */
+
     public function isUnzerOrder(): bool
     {
         $isUnzer = false;
@@ -508,7 +499,7 @@ class AdminOrderController extends AdminDetailsController
         return $datetime->format('Y-m-d H:i:s');
     }
 
-    private function getFullCancelled(\UnzerSDK\Resources\Payment $unzerPayment): float
+    private function getFullCancelled(UnzerPaymentResource $unzerPayment): float
     {
         $fCancelled = 0.0;
         /** @var Cancellation $cancellation */
@@ -519,5 +510,22 @@ class AdminOrderController extends AdminDetailsController
         }
 
         return $fCancelled;
+    }
+
+    private function filterTransactionList(
+        UnzerPaymentResource $unzerPayment,
+        TransactionList $transactionList
+    ): TransactionList {
+        $traceId = $unzerPayment->getTraceId();
+        $filteredTransactionList = new TransactionList();
+        foreach ($transactionList as $transaction) {
+            if (!is_null($transaction) && $transaction->oscunzertransaction__traceid) {
+                if ($traceId === $transaction->oscunzertransaction__traceid->rawValue) {
+                    $filteredTransactionList->add($transaction);
+                }
+            }
+        }
+
+        return $filteredTransactionList;
     }
 }
