@@ -292,8 +292,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         $oldValue = $this->moduleSettings->getApplePayMerchantCertKey();
 
         $this->setIsUpdate($oldValue, $newValue);
-
-        $isValidMerchantKey = $this->validateCredentialsForSaving($newValue, $errorIds);
+        $isValidMerchantKey = $this->validateCredentialsForSaving($oldValue, $newValue, $errorIds);
 
         if ($isValidMerchantKey) {
             $service = $this->getServiceFromContainer(AppleMerchantCertificate::class);
@@ -315,7 +314,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         $oldValue = $this->moduleSettings->getApplePayMerchantIdentifier();
 
         $this->setIsUpdate($oldValue, $newValue);
-        $isValid = $this->validateCredentialsForSaving($newValue, $errorIds);
+
+        $isValid = $this->validateCredentialsForSaving($oldValue, $newValue, $errorIds);
 
         if ($isValid) {
             $this->moduleSettings->setApplePayMerchantIdentifier($newValue);
@@ -337,7 +337,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         $this->setIsUpdate($oldValue, $newValue);
 
-        $isValidMerchantCert = $this->validateCredentialsForSaving($newValue, $errorIds);
+        $isValidMerchantCert = $this->validateCredentialsForSaving($oldValue, $newValue, $errorIds);
 
         if ($isValidMerchantCert) {
             $service = $this->getServiceFromContainer(AppleMerchantCertificate::class);
@@ -362,7 +362,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         $oldValue = $this->moduleSettings->getApplePayPaymentPrivateKey();
 
         $this->setIsUpdate($oldValue, $newValue);
-        $isValidPaymentKey = $this->validateCredentialsForSaving($newValue, $errorIds);
+        $isValidPaymentKey = $this->validateCredentialsForSaving($oldValue, $newValue, $errorIds);
 
         if ($isValidPaymentKey) {
             $service = $this->getServiceFromContainer(ApplePaymentProcessingCertificate::class);
@@ -388,7 +388,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         $this->setIsUpdate($oldValue, $newValue);
 
-        $isValidPaymentKey = $this->validateCredentialsForSaving($newValue, $errorIds);
+        $isValidPaymentKey = $this->validateCredentialsForSaving($oldValue, $newValue, $errorIds);
 
         if ($isValidPaymentKey) {
             $service = $this->getServiceFromContainer(ApplePaymentProcessingCertificate::class);
@@ -396,16 +396,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
-    private function validateCredentialsForSaving(?string $string, array $errors): bool
+    private function validateCredentialsForSaving(?string $oldValue, ?string $newValue, array $errors): bool
     {
-        if ($string === null || strlen($string) === 0) {
+        if (($newValue === null || strlen($newValue) === 0) && !empty($oldValue)) {
             if ($this->getIsUpdate()) {
                 $this->addErrorToDisplay($errors['onEmpty']);
             }
             return true;
         }
 
-        if (strlen($string) > 1 && strlen($string) < 32) {
+        if (is_string($newValue) && strlen($newValue) > 1 && strlen($newValue) < 32) {
             $this->addErrorToDisplay($errors['onShort']);
             return false;
         }
@@ -427,7 +427,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
     private function setIsUpdate(?string $oldValue, ?string $newValue): bool
     {
-        $this->isUpdate = ($oldValue !== $newValue) && !empty($newValue);
+        $this->isUpdate = ($oldValue !== $newValue);
         return $this->isUpdate;
     }
 

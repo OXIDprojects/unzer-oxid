@@ -103,6 +103,8 @@ final class BancontactCest extends BaseCest
      */
     public function checkMastercardPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped('Skipping this test - payment is down on unzer');
+
         $I->wantToTest('Test Bancontact Mastercard payment works');
         $this->prepareBancontactTest($I);
         $this->submitBancontactPayment('mastercard_payment');
@@ -115,6 +117,8 @@ final class BancontactCest extends BaseCest
      */
     public function checkVisaPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped('Skipping this test - payment is down on unzer');
+
         $I->wantToTest('Test Bancontact Visa payment works');
         $this->prepareBancontactTest($I);
         $this->submitBancontactPayment('visa_payment');
@@ -127,6 +131,8 @@ final class BancontactCest extends BaseCest
      */
     public function checkMaestroPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped('Skipping this test - payment is down on unzer');
+
         $I->wantToTest('Test Bancontact Maestro payment works');
         $this->prepareBancontactTest($I);
         $this->submitBancontactPayment('maestro_payment');

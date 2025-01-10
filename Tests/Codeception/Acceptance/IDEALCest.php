@@ -61,6 +61,8 @@ final class IDEALCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped('Skipping this test - payment requires mobile app');
+
         $I->wantToTest('Test iDEAL payment works');
         $this->initializeTest();
         $orderPage = $this->choosePayment($this->idealPaymentLabel);
